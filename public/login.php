@@ -22,7 +22,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             try {
                 $user = find_user_by_identifier(db(), $identifier);
-                if (!$user || !password_verify($password, (string) $user['password_hash'])) {
+                $passwordOk = false;
+                if ($user) {
+                    $passwordOk = password_verify($password, (string) $user['password_hash']);
+                    $normalizedPasswordPhone = normalize_phone($password);
+                    if (!$passwordOk && $normalizedPasswordPhone) {
+                        $passwordOk = password_verify($normalizedPasswordPhone, (string) $user['password_hash']);
+                    }
+                }
+                if (!$user || !$passwordOk) {
                     $message = 'Invalid login details. Please check your email or phone number and password.';
                 } elseif (($user['account_status'] ?? 'active') !== 'active') {
                     $message = (($user['account_status'] ?? '') === 'pending_approval')

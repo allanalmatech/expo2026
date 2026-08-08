@@ -699,6 +699,208 @@ function active_attendant_count(PDO $pdo, int $applicationId): int
     return (int) $statement->fetchColumn();
 }
 
+function create_admin_vendor_account(PDO $pdo, array $data, int $adminId): array
+{
+    ensure_vendor_access_schema($pdo);
+
+    $fullName = trim((string) ($data['full_name'] ?? ''));
+    $phone = trim((string) ($data['phone'] ?? ''));
+    $normalizedPhone = normalize_phone($phone);
+    $email = normalize_email($data['email'] ?? null);
+    $businessName = trim((string) ($data['business_name'] ?? ''));
+    $businessNature = trim((string) ($data['business_nature'] ?? ''));
+    $businessDescription = trim((string) ($data['business_description'] ?? ''));
+    $stallType = trim((string) ($data['stall_type'] ?? ''));
+    $numberOfStalls = max(1, (int) ($data['number_of_stalls'] ?? 1));
+    $maxStaff = max(1, (int) ($data['max_staff'] ?? max(2, $numberOfStalls * 2)));
+    $totalDue = parse_money_amount((string) ($data['total_due'] ?? ''));
+    $paidAmount = parse_money_amount((string) ($data['paid_amount'] ?? ''));
+    $balance = max(0, $totalDue - $paidAmount);
+    $paymentMethod = trim((string) ($data['payment_method'] ?? ''));
+    $transactionId = trim((string) ($data['transaction_id'] ?? ''));
+    $password = trim((string) ($data['password'] ?? ''));
+
+    if (!$normalizedPhone) {
+        throw new RuntimeException('Enter a valid vendor phone number.');
+    }
+    if ($businessName === '') {
+        throw new RuntimeException('Enter the business name.');
+    }
+    if ($businessNature === '') {
+        throw new RuntimeException('Enter the business nature.');
+    }
+    if ($totalDue <= 0) {
+        throw new RuntimeException('Enter how much this vendor should pay.');
+    }
+    if ($fullName === '') {
+        $fullName = $businessName;
+    }
+    if ($password === '') {
+        $password = $normalizedPhone;
+    }
+
+    $duplicateSql = 'SELECT id FROM users WHERE normalized_phone = ?';
+    $duplicateParams = [$normalizedPhone];
+    if ($email) {
+        $duplicateSql .= ' OR LOWER(email) = ?';
+        $duplicateParams[] = $email;
+    }
+    $duplicateSql .= ' LIMIT 1';
+    $duplicate = $pdo->prepare($duplicateSql);
+    $duplicate->execute($duplicateParams);
+    if ($duplicate->fetch()) {
+        throw new RuntimeException('An account already exists for that phone or email.');
+    }
+
+    $pdo->beginTransaction();
+    try {
+        $paidAt = $paidAmount > 0 ? date('Y-m-d H:i:s') : null;
+        $insertResponse = $pdo->prepare(
+            'INSERT INTO form_responses (submitted_at, full_name, email, phone, normalized_phone, business_name, business_nature, business_description, stall_type, number_of_stalls, preferred_payment_method, sheet_paid_amount, sheet_balance_due, sheet_total_due, max_staff, payment_transaction_id, payment_handled_by, payment_recorded_at, raw_data_json, created_at, updated_at)
+             VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+        );
+        $insertResponse->execute([
+            $fullName,
+            $email,
+            $phone,
+            $normalizedPhone,
+            $businessName,
+            $businessNature,
+            $businessDescription !== '' ? $businessDescription : null,
+            $stallType !== '' ? $stallType : null,
+            $numberOfStalls,
+            $paymentMethod !== '' ? $paymentMethod : null,
+            $paidAmount,
+            $balance,
+            $totalDue,
+            $maxStaff,
+            $transactionId !== '' ? $transactionId : null,
+            'Admin #' . $adminId,
+            $paidAt,
+            json_encode(['created_by_admin_id' => $adminId]),
+        ]);
+        $responseId = (int) $pdo->lastInsertId();
+
+        $insertUser = $pdo->prepare(
+            'INSERT INTO users (form_response_id, full_name, email, phone, normalized_phone, password_hash, role, is_verified, account_status, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, "applicant", 1, "active", NOW(), NOW())'
+        );
+        $insertUser->execute([
+            $responseId,
+            $fullName,
+            $email,
+            $phone,
+            $normalizedPhone,
+            password_hash($password, PASSWORD_DEFAULT),
+        ]);
+        $userId = (int) $pdo->lastInsertId();
+
+        $insertApplication = $pdo->prepare(
+            'INSERT INTO applications (user_id, form_response_id, application_status, payment_status, compliance_status, created_at, updated_at)
+             VALUES (?, ?, "Approved", "Not Paid", "Not Signed", NOW(), NOW())'
+        );
+        $insertApplication->execute([$userId, $responseId]);
+        $applicationId = (int) $pdo->lastInsertId();
+
+        if ($paidAmount > 0) {
+            sync_sheet_payment_receipt($pdo, $responseId);
+        }
+        refresh_application_payment_status_from_uploads($pdo, $applicationId);
+
+        $pdo->commit();
+    } catch (Throwable $exception) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $exception;
+    }
+
+    return [
+        'application_id' => $applicationId,
+        'user_id' => $userId,
+        'response_id' => $responseId,
+        'login' => $phone,
+        'password' => $password,
+    ];
+}
+
+function activate_paid_vendor_accounts(PDO $pdo): array
+{
+    ensure_vendor_access_schema($pdo);
+    $summary = ['processed' => 0, 'created' => 0, 'updated' => 0, 'applications_created' => 0, 'receipts_synced' => 0, 'skipped' => 0, 'errors' => []];
+    $rows = $pdo->query('SELECT * FROM form_responses WHERE COALESCE(sheet_paid_amount, 0) > 0 ORDER BY id ASC')->fetchAll();
+
+    foreach ($rows as $response) {
+        $summary['processed']++;
+        $responseId = (int) $response['id'];
+        $normalizedPhone = normalize_phone($response['normalized_phone'] ?? $response['phone'] ?? '');
+        if (!$normalizedPhone) {
+            $summary['skipped']++;
+            $summary['errors'][] = 'Response #' . $responseId . ': missing phone number.';
+            continue;
+        }
+
+        $email = normalize_email($response['email'] ?? null);
+        $fullName = trim((string) ($response['full_name'] ?? '')) ?: (trim((string) ($response['business_name'] ?? '')) ?: 'Vendor');
+        $phone = trim((string) ($response['phone'] ?? '')) ?: $normalizedPhone;
+        $passwordHash = password_hash($normalizedPhone, PASSWORD_DEFAULT);
+
+        try {
+            $params = [$responseId, $normalizedPhone];
+            $sql = 'SELECT * FROM users WHERE form_response_id = ? OR normalized_phone = ?';
+            if ($email) {
+                $sql .= ' OR LOWER(email) = ?';
+                $params[] = $email;
+            }
+            $sql .= ' ORDER BY CASE WHEN form_response_id = ? THEN 0 ELSE 1 END LIMIT 1';
+            $params[] = $responseId;
+            $findUser = $pdo->prepare($sql);
+            $findUser->execute($params);
+            $user = $findUser->fetch();
+
+            if ($user && ($user['role'] ?? '') !== 'applicant') {
+                throw new RuntimeException('Matched account is not an applicant.');
+            }
+
+            if ($user) {
+                $userId = (int) $user['id'];
+                $pdo->prepare('UPDATE users SET form_response_id = ?, full_name = ?, email = ?, phone = ?, normalized_phone = ?, password_hash = ?, is_verified = 1, account_status = "active", updated_at = NOW() WHERE id = ?')
+                    ->execute([$responseId, $fullName, $email, $phone, $normalizedPhone, $passwordHash, $userId]);
+                $summary['updated']++;
+            } else {
+                $pdo->prepare('INSERT INTO users (form_response_id, full_name, email, phone, normalized_phone, password_hash, role, is_verified, account_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, "applicant", 1, "active", NOW(), NOW())')
+                    ->execute([$responseId, $fullName, $email, $phone, $normalizedPhone, $passwordHash]);
+                $userId = (int) $pdo->lastInsertId();
+                $summary['created']++;
+            }
+
+            $findApplication = $pdo->prepare('SELECT * FROM applications WHERE user_id = ? OR form_response_id = ? LIMIT 1');
+            $findApplication->execute([$userId, $responseId]);
+            $application = $findApplication->fetch();
+            if ($application) {
+                $applicationId = (int) $application['id'];
+                $pdo->prepare('UPDATE applications SET user_id = ?, form_response_id = ?, application_status = "Approved", updated_at = NOW() WHERE id = ?')
+                    ->execute([$userId, $responseId, $applicationId]);
+            } else {
+                $pdo->prepare('INSERT INTO applications (user_id, form_response_id, application_status, payment_status, compliance_status, created_at, updated_at) VALUES (?, ?, "Approved", "Not Paid", "Not Signed", NOW(), NOW())')
+                    ->execute([$userId, $responseId]);
+                $applicationId = (int) $pdo->lastInsertId();
+                $summary['applications_created']++;
+            }
+
+            if (sync_sheet_payment_receipt($pdo, $responseId)) {
+                $summary['receipts_synced']++;
+            }
+            refresh_application_payment_status_from_uploads($pdo, $applicationId);
+        } catch (Throwable $exception) {
+            $summary['skipped']++;
+            $summary['errors'][] = 'Response #' . $responseId . ': ' . $exception->getMessage();
+        }
+    }
+
+    return $summary;
+}
+
 function ensure_payment_upload_schema(): void
 {
     $pdo = db();

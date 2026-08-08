@@ -8,6 +8,7 @@ $active = $active ?? '';
 $adminNav = [
     'dashboard' => ['Dashboard', 'admin/dashboard.php'],
     'applications' => ['Applications', 'admin/applications.php'],
+    'create_vendor' => ['Create Vendor', 'admin/create-vendor.php'],
     'payments' => ['Payments', 'admin/payments.php'],
     'pricing' => ['Pricing', 'admin/pricing.php'],
     'messages' => ['Messaging', 'admin/messages.php'],
@@ -46,6 +47,15 @@ $nav = $role === 'admin' ? $adminNav : $applicantNav;
         <?php endforeach; ?>
     </nav>
     <div class="sidebar-footer">
+        <div class="sidebar-zoom" aria-label="Interface zoom controls">
+            <span>Zoom</span>
+            <div class="sidebar-zoom-actions">
+                <button type="button" data-ui-zoom="out" aria-label="Zoom out">-</button>
+                <strong data-ui-zoom-label>100%</strong>
+                <button type="button" data-ui-zoom="in" aria-label="Zoom in">+</button>
+                <button type="button" data-ui-zoom="reset" aria-label="Reset zoom">Reset</button>
+            </div>
+        </div>
         <?php if ($role === 'admin'): ?>
             <a class="button button-secondary button-block" href="<?php echo h(app_url('admin/reports.php')); ?>">Export Data</a>
         <?php endif; ?>

@@ -65,9 +65,10 @@ require_once __DIR__ . '/../includes/header.php';
                 <p>Search, filter, review, and update imported vendor profiles.</p>
             </div>
             <div class="header-actions">
+                <a class="button button-primary" href="<?php echo h(app_url('admin/create-vendor.php')); ?>">Create Vendor Account</a>
                 <a class="button button-secondary" href="<?php echo h(app_url('admin/messages.php')); ?>">Bulk Announcement</a>
                 <a class="button button-ghost" href="<?php echo h(app_url('admin/messages.php')); ?>">Send Message</a>
-                <a class="button button-primary" href="<?php echo h(app_url('admin/reports.php?export=applicants')); ?>">Export CSV</a>
+                <a class="button button-secondary" href="<?php echo h(app_url('admin/reports.php?export=applicants')); ?>">Export CSV</a>
             </div>
         </div>
 

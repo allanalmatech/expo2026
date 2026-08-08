@@ -84,6 +84,31 @@
 
     const sidebar = document.getElementById('sidebar');
     const publicLinks = document.getElementById('public-links');
+    const zoomButtons = Array.from(document.querySelectorAll('[data-ui-zoom]'));
+    const zoomLabels = Array.from(document.querySelectorAll('[data-ui-zoom-label]'));
+    const zoomSteps = [0.8, 0.88, 0.94, 1, 1.08, 1.15];
+
+    function nearestZoomStep(value) {
+        return zoomSteps.reduce((closest, step) => Math.abs(step - value) < Math.abs(closest - value) ? step : closest, zoomSteps[2]);
+    }
+
+    function applyUiZoom(value) {
+        const zoom = nearestZoomStep(Number(value) || zoomSteps[2]);
+        document.documentElement.style.setProperty('--ui-scale', String(zoom));
+        zoomLabels.forEach((label) => { label.textContent = `${Math.round(zoom * 100)}%`; });
+        try { window.localStorage.setItem('expo-ui-zoom', String(zoom)); } catch (error) { /* Ignore unavailable storage. */ }
+    }
+
+    function currentZoomIndex() {
+        const current = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale')) || zoomSteps[2];
+        return zoomSteps.indexOf(nearestZoomStep(current));
+    }
+
+    try {
+        applyUiZoom(window.localStorage.getItem('expo-ui-zoom') || zoomSteps[2]);
+    } catch (error) {
+        applyUiZoom(zoomSteps[2]);
+    }
 
     document.addEventListener('click', (event) => {
         const target = event.target;
@@ -99,6 +124,19 @@
 
         if (target.matches('[data-public-nav-toggle]') && publicLinks) {
             publicLinks.classList.toggle('open');
+        }
+
+        const zoomButton = target.closest('[data-ui-zoom]');
+        if (zoomButton instanceof HTMLElement) {
+            const action = zoomButton.getAttribute('data-ui-zoom') || 'reset';
+            const index = currentZoomIndex();
+            if (action === 'in') {
+                applyUiZoom(zoomSteps[Math.min(zoomSteps.length - 1, index + 1)]);
+            } else if (action === 'out') {
+                applyUiZoom(zoomSteps[Math.max(0, index - 1)]);
+            } else {
+                applyUiZoom(zoomSteps[2]);
+            }
         }
     });
 

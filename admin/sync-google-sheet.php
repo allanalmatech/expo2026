@@ -8,6 +8,7 @@ $active = 'sheet_sync';
 $pageTitle = 'Google Sheet Sync';
 $pdo = db();
 $summary = null;
+$activationSummary = null;
 
 $token = setting('google_sheet_cron_token', '');
 if ($token === '') {
@@ -19,25 +20,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_csrf();
     $action = (string) ($_POST['action'] ?? 'save');
 
-    save_setting('google_sheet_url', trim((string) ($_POST['google_sheet_url'] ?? '')));
-    save_setting('google_sheet_gid', trim((string) ($_POST['google_sheet_gid'] ?? '0')) ?: '0');
-    save_setting('google_sheet_auto_sync_enabled', isset($_POST['google_sheet_auto_sync_enabled']) ? '1' : '0');
-
-    if (!empty($_POST['regenerate_token'])) {
-        $token = bin2hex(random_bytes(24));
-        save_setting('google_sheet_cron_token', $token);
-    }
-
-    if ($action === 'sync') {
-        $summary = sync_google_sheet_responses((int) $admin['id']);
-        if (!empty($summary['errors'])) {
-            set_flash('error', 'Sheet sync completed with errors. Review the summary below.');
+    if ($action === 'activate_paid') {
+        $activationSummary = activate_paid_vendor_accounts($pdo);
+        if (!empty($activationSummary['errors'])) {
+            set_flash('error', 'Paid account activation completed with errors. Review the summary below.');
         } else {
-            set_flash('success', 'Google Sheet synced successfully.');
+            set_flash('success', 'Paid vendor accounts activated successfully.');
         }
     } else {
-        set_flash('success', 'Google Sheet sync settings saved.');
-        redirect('admin/sync-google-sheet.php');
+
+        save_setting('google_sheet_url', trim((string) ($_POST['google_sheet_url'] ?? '')));
+        save_setting('google_sheet_gid', trim((string) ($_POST['google_sheet_gid'] ?? '0')) ?: '0');
+        save_setting('google_sheet_auto_sync_enabled', isset($_POST['google_sheet_auto_sync_enabled']) ? '1' : '0');
+
+        if (!empty($_POST['regenerate_token'])) {
+            $token = bin2hex(random_bytes(24));
+            save_setting('google_sheet_cron_token', $token);
+        }
+
+        if ($action === 'sync') {
+            $summary = sync_google_sheet_responses((int) $admin['id']);
+            if (!empty($summary['errors'])) {
+                set_flash('error', 'Sheet sync completed with errors. Review the summary below.');
+            } else {
+                set_flash('success', 'Google Sheet synced successfully.');
+            }
+        } else {
+            set_flash('success', 'Google Sheet sync settings saved.');
+            redirect('admin/sync-google-sheet.php');
+        }
     }
 }
 
@@ -80,6 +91,21 @@ require_once __DIR__ . '/../includes/header.php';
                     <article class="stat-card"><span class="label">Skipped</span><strong><?php echo number_format((int) $summary['skipped']); ?></strong></article>
                 </div>
                 <?php foreach (($summary['errors'] ?? []) as $error): ?><p class="danger-text"><?php echo h($error); ?></p><?php endforeach; ?>
+            </section>
+        <?php endif; ?>
+
+        <?php if ($activationSummary): ?>
+            <section class="panel">
+                <h2>Paid Account Activation Summary</h2>
+                <div class="stat-grid">
+                    <article class="stat-card"><span class="label">Paid Rows</span><strong><?php echo number_format((int) $activationSummary['processed']); ?></strong></article>
+                    <article class="stat-card"><span class="label">Accounts Created</span><strong><?php echo number_format((int) $activationSummary['created']); ?></strong></article>
+                    <article class="stat-card"><span class="label">Accounts Updated</span><strong><?php echo number_format((int) $activationSummary['updated']); ?></strong></article>
+                    <article class="stat-card"><span class="label">Applications Created</span><strong><?php echo number_format((int) $activationSummary['applications_created']); ?></strong></article>
+                    <article class="stat-card"><span class="label">Receipts Synced</span><strong><?php echo number_format((int) $activationSummary['receipts_synced']); ?></strong></article>
+                    <article class="stat-card"><span class="label">Skipped</span><strong><?php echo number_format((int) $activationSummary['skipped']); ?></strong></article>
+                </div>
+                <?php foreach (($activationSummary['errors'] ?? []) as $error): ?><p class="danger-text"><?php echo h($error); ?></p><?php endforeach; ?>
             </section>
         <?php endif; ?>
 
@@ -131,6 +157,16 @@ require_once __DIR__ . '/../includes/header.php';
                 </form>
             </aside>
         </div>
+
+        <section class="panel" style="margin-top: 22px;">
+            <h2>Paid Vendor Account Activation</h2>
+            <p>Creates or updates applicant logins for every synced sheet row with a paid amount. The normalized phone number is used as both username and password, and matching applications are approved.</p>
+            <form method="post" data-confirm="Activate all paid vendor accounts and reset their passwords to their normalized phone numbers?">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="action" value="activate_paid">
+                <button class="button button-primary" type="submit">Activate Paid Vendor Accounts</button>
+            </form>
+        </section>
 
         <section class="panel" style="margin-top: 22px;">
             <h2>How to Prepare the Paid Register</h2>
