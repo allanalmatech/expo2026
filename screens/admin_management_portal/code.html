@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard | Freshers Expo 2026</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Montserrat:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        /* Custom scrollbar for professional look */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e5e2e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c8c6c5; }
+        
+        .glass-header {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#e5e2e1",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#989999",
+                        "surface-container-highest": "#e2e2e2",
+                        "primary-container": "#ff6b00",
+                        "surface": "#f9f9f9",
+                        "surface-tint": "#a04100",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#636262",
+                        "on-primary-container": "#572000",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "surface-dim": "#dadada",
+                        "background": "#f9f9f9",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#ffb693",
+                        "primary-fixed": "#ffdbcc",
+                        "surface-container": "#eeeeee",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-variant": "#e2e2e2",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary": "#5d5f5f",
+                        "surface-container-low": "#f3f3f3",
+                        "on-tertiary-container": "#2f3132",
+                        "primary": "#a04100",
+                        "outline-variant": "#e2bfb0",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#5a4136",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#351000",
+                        "on-surface": "#1a1c1c",
+                        "tertiary-fixed": "#e2e2e2",
+                        "outline": "#8e7164",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "primary-fixed-dim": "#ffb693",
+                        "secondary-container": "#e2dfde",
+                        "on-secondary-fixed-variant": "#474746",
+                        "secondary": "#5f5e5e",
+                        "inverse-surface": "#2f3131",
+                        "surface-bright": "#f9f9f9",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "inverse-on-surface": "#f1f1f1",
+                        "on-background": "#1a1c1c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "container-max": "1280px",
+                        "xs": "4px",
+                        "md": "24px",
+                        "xl": "80px",
+                        "sm": "12px",
+                        "lg": "48px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "button": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "headline-md": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "headline-lg": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "button": ["16px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-background font-body-md">
+<!-- Sidebar Navigation Shell -->
+<aside class="hidden md:flex flex-col h-screen p-md space-y-base fixed left-0 top-0 w-[280px] bg-surface-container-lowest border-r border-outline-variant shadow-sm z-50">
+<div class="mb-lg">
+<h1 class="font-headline-md text-headline-md text-primary font-bold">Management Portal</h1>
+<p class="text-secondary font-body-sm">Expo 2026 Admin</p>
+</div>
+<nav class="flex-1 space-y-2">
+<!-- Applications is Active -->
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 bg-primary-container text-on-primary-container font-bold rounded-lg px-4 py-3 translate-x-1 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
+<span class="font-body-md">Applications</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md">Payments</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-body-md">Messaging</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-body-md">Compliance</span>
+</a>
+</nav>
+<div class="pt-base border-t border-outline-variant space-y-2">
+<button class="w-full bg-inverse-surface text-on-primary font-button py-3 px-4 rounded-lg flex items-center justify-center space-x-2 hover:opacity-90 transition-opacity mb-4">
+<span class="material-symbols-outlined">file_download</span>
+<span>Export Data</span>
+</button>
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-[280px] min-h-screen bg-surface">
+<!-- Header -->
+<header class="sticky top-0 z-40 glass-header border-b border-outline-variant px-gutter py-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Applicant Manager</h2>
+<p class="text-secondary font-body-sm">Reviewing 1,284 imported vendor profiles</p>
+</div>
+<div class="flex flex-wrap gap-sm">
+<button class="bg-secondary text-on-secondary font-button px-4 py-2 rounded flex items-center space-x-2 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">campaign</span>
+<span>Bulk Announcement</span>
+</button>
+<button class="border-2 border-primary text-primary font-button px-4 py-2 rounded flex items-center space-x-2 hover:bg-primary-fixed transition-all">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+<span>Send Message</span>
+</button>
+<button class="bg-primary text-on-primary font-button px-4 py-2 rounded flex items-center space-x-2 hover:opacity-90 shadow-md transition-all">
+<span class="material-symbols-outlined text-[20px]">download</span>
+<span>Export CSV</span>
+</button>
+</div>
+</header>
+<div class="p-gutter">
+<!-- Statistics Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-lg">
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border-l-4 border-primary">
+<div class="flex items-center justify-between mb-2">
+<span class="text-secondary font-label-md">TOTAL APPLICANTS</span>
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<div class="text-display-lg font-display-lg text-on-surface">1,284</div>
+<div class="text-body-sm text-primary font-semibold">+12% from last week</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border-l-4 border-[#4CAF50]">
+<div class="flex items-center justify-between mb-2">
+<span class="text-secondary font-label-md">PAID VENDORS</span>
+<span class="material-symbols-outlined text-[#4CAF50]">payments</span>
+</div>
+<div class="text-display-lg font-display-lg text-on-surface">842</div>
+<div class="text-body-sm text-secondary">65% Conversion rate</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border-l-4 border-primary-container">
+<div class="flex items-center justify-between mb-2">
+<span class="text-secondary font-label-md">PENDING ALLOCATION</span>
+<span class="material-symbols-outlined text-primary-container">storefront</span>
+</div>
+<div class="text-display-lg font-display-lg text-on-surface">156</div>
+<div class="text-body-sm text-primary-container font-semibold">Priority Action Required</div>
+</div>
+</section>
+<!-- Table View Container -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden border border-outline-variant">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary">search</span>
+<input class="w-full pl-10 pr-4 py-2 rounded border border-outline focus:border-primary-container focus:ring-2 focus:ring-primary-container outline-none font-body-sm" placeholder="Search applicants, businesses, or stall numbers..." type="text"/>
+</div>
+<div class="flex items-center space-x-2">
+<button class="p-2 text-secondary hover:bg-surface-container-high rounded transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 text-secondary hover:bg-surface-container-high rounded transition-colors">
+<span class="material-symbols-outlined">sort</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high text-on-surface-variant uppercase text-[12px] font-bold tracking-wider">
+<th class="px-md py-4">Name</th>
+<th class="px-md py-4">Business</th>
+<th class="px-md py-4">Contact</th>
+<th class="px-md py-4">Payment Link</th>
+<th class="px-md py-4">Status</th>
+<th class="px-md py-4">Assigned Stall</th>
+<th class="px-md py-4 text-center">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-md py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed-dim flex items-center justify-center text-primary font-bold">JD</div>
+<span class="font-semibold text-on-surface">John Doe</span>
+</div>
+</td>
+<td class="px-md py-4 font-body-md">Artisanal Coffee Co.</td>
+<td class="px-md py-4 text-secondary font-body-sm">john@coffee.com</td>
+<td class="px-md py-4">
+<a class="text-primary hover:underline flex items-center space-x-1 font-body-sm" href="#">
+<span>pay.expo/ac26</span>
+<span class="material-symbols-outlined text-[14px]">open_in_new</span>
+</a>
+</td>
+<td class="px-md py-4">
+<select class="bg-[#E8F5E9] text-[#2E7D32] border-none rounded-full px-4 py-1 text-xs font-bold focus:ring-0 cursor-pointer appearance-none">
+<option selected="" value="Paid">Paid</option>
+<option value="Pending">Pending</option>
+<option value="Approved">Approved</option>
+<option value="Rejected">Rejected</option>
+</select>
+</td>
+<td class="px-md py-4">
+<input class="w-20 px-2 py-1 border border-outline rounded text-center font-body-sm focus:border-primary-container outline-none" type="text" value="A-12"/>
+</td>
+<td class="px-md py-4 text-center">
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-md py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary font-bold">SS</div>
+<span class="font-semibold text-on-surface">Sarah Smith</span>
+</div>
+</td>
+<td class="px-md py-4 font-body-md">TechNova Gadgets</td>
+<td class="px-md py-4 text-secondary font-body-sm">sarah@technova.io</td>
+<td class="px-md py-4">
+<a class="text-primary hover:underline flex items-center space-x-1 font-body-sm" href="#">
+<span>pay.expo/tn92</span>
+<span class="material-symbols-outlined text-[14px]">open_in_new</span>
+</a>
+</td>
+<td class="px-md py-4">
+<select class="bg-orange-100 text-orange-700 border-none rounded-full px-4 py-1 text-xs font-bold focus:ring-0 cursor-pointer appearance-none">
+<option selected="" value="Pending">Pending</option>
+<option value="Paid">Paid</option>
+<option value="Approved">Approved</option>
+<option value="Rejected">Rejected</option>
+</select>
+</td>
+<td class="px-md py-4">
+<input class="w-20 px-2 py-1 border border-outline rounded text-center font-body-sm focus:border-primary-container outline-none" placeholder="Assign" type="text"/>
+</td>
+<td class="px-md py-4 text-center">
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-md py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary font-bold">MB</div>
+<span class="font-semibold text-on-surface">Mark Brown</span>
+</div>
+</td>
+<td class="px-md py-4 font-body-md">Sustainable Living</td>
+<td class="px-md py-4 text-secondary font-body-sm">mark@green.org</td>
+<td class="px-md py-4">
+<span class="text-tertiary-container font-body-sm italic">Link Expired</span>
+</td>
+<td class="px-md py-4">
+<select class="bg-surface-variant text-on-surface-variant border-none rounded-full px-4 py-1 text-xs font-bold focus:ring-0 cursor-pointer appearance-none">
+<option selected="" value="Approved">Approved</option>
+<option value="Paid">Paid</option>
+<option value="Pending">Pending</option>
+<option value="Rejected">Rejected</option>
+</select>
+</td>
+<td class="px-md py-4">
+<input class="w-20 px-2 py-1 border border-outline rounded text-center font-body-sm focus:border-primary-container outline-none" type="text" value="C-04"/>
+</td>
+<td class="px-md py-4 text-center">
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-md py-4">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-error-container flex items-center justify-center text-error font-bold">LA</div>
+<span class="font-semibold text-on-surface">Lisa Anderson</span>
+</div>
+</td>
+<td class="px-md py-4 font-body-md">Anderson Law Firm</td>
+<td class="px-md py-4 text-secondary font-body-sm">lisa@legal.com</td>
+<td class="px-md py-4">
+<span class="text-tertiary-container font-body-sm italic">-</span>
+</td>
+<td class="px-md py-4">
+<select class="bg-error-container text-on-error-container border-none rounded-full px-4 py-1 text-xs font-bold focus:ring-0 cursor-pointer appearance-none">
+<option selected="" value="Rejected">Rejected</option>
+<option value="Paid">Paid</option>
+<option value="Pending">Pending</option>
+<option value="Approved">Approved</option>
+</select>
+</td>
+<td class="px-md py-4">
+<input class="w-20 px-2 py-1 bg-surface-container border border-outline-variant rounded text-center font-body-sm opacity-50" disabled="" type="text"/>
+</td>
+<td class="px-md py-4 text-center">
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-md bg-surface-container-low flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="font-body-sm text-secondary">Showing 1 to 4 of 1,284 entries</p>
+<div class="flex items-center space-x-2">
+<button class="px-3 py-1 border border-outline rounded hover:bg-surface-container-high transition-colors text-secondary">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="px-4 py-1 bg-primary text-on-primary rounded font-bold">1</button>
+<button class="px-4 py-1 hover:bg-surface-container-high rounded transition-colors">2</button>
+<button class="px-4 py-1 hover:bg-surface-container-high rounded transition-colors">3</button>
+<span class="px-2">...</span>
+<button class="px-4 py-1 hover:bg-surface-container-high rounded transition-colors">129</button>
+<button class="px-3 py-1 border border-outline rounded hover:bg-surface-container-high transition-colors text-secondary">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="w-full py-lg px-gutter flex flex-col md:flex-row justify-between items-center bg-inverse-surface border-t border-outline-variant mt-xl">
+<div class="mb-4 md:mb-0">
+<h3 class="font-headline-md text-headline-md text-on-primary">Freshers Expo 2026</h3>
+<p class="text-on-secondary-fixed-variant font-body-sm mt-1">© 2026 Freshers Expo Committee. All Rights Reserved.</p>
+</div>
+<div class="flex space-x-6">
+<a class="text-on-secondary-fixed-variant hover:text-on-primary transition-all font-body-sm" href="#">Privacy Policy</a>
+<a class="text-on-secondary-fixed-variant hover:text-on-primary transition-all font-body-sm" href="#">Terms of Service</a>
+<a class="text-on-secondary-fixed-variant hover:text-on-primary transition-all font-body-sm" href="#">Contact Support</a>
+</div>
+</footer>
+</main>
+<script>
+        // Simple micro-interactions for the table rows and inputs
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'SELECT' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                    // Logic for row selection if needed
+                }
+            });
+        });
+
+        // Dynamic status color changing for dropdowns
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', function() {
+                const val = this.value;
+                this.classList.remove('bg-[#E8F5E9]', 'text-[#2E7D32]', 'bg-orange-100', 'text-orange-700', 'bg-surface-variant', 'text-on-surface-variant', 'bg-error-container', 'text-on-error-container');
+                
+                if (val === 'Paid') {
+                    this.classList.add('bg-[#E8F5E9]', 'text-[#2E7D32]');
+                } else if (val === 'Pending') {
+                    this.classList.add('bg-orange-100', 'text-orange-700');
+                } else if (val === 'Approved') {
+                    this.classList.add('bg-surface-variant', 'text-on-surface-variant');
+                } else if (val === 'Rejected') {
+                    this.classList.add('bg-error-container', 'text-on-error-container');
+                }
+            });
+        });
+    </script>
+</body></html>

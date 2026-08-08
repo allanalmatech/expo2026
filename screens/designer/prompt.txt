@@ -1,0 +1,116 @@
+# Build Prompt: Admin Drag-and-Drop Venue Layout Designer Module
+
+Paste everything below into opencode as the task brief.
+
+---
+
+## Context
+
+I have an existing PHP + MySQL web portal called **Freshers Expo Stall Management Portal** (MUST Freshers Expo 2026). Stack rules — do not deviate:
+
+- Plain PHP 8, MySQL/MariaDB, vanilla JavaScript, AJAX, HTML, CSS only.
+- No Laravel, React, Vue, Angular, Bootstrap, Tailwind, Composer, or any frontend framework.
+- PDO prepared statements only. Use the existing `h()` output-escaping helper and `csrf_field()` / `require_csrf()` for all forms and state-changing AJAX calls.
+- Sessions are HTTP-only + SameSite=Lax already; don't touch session config.
+- Must run on ordinary shared hosting / cPanel, so no build step, no Node dependency, no bundler.
+
+Existing folder structure:
+
+```text
+assets/css/
+assets/js/
+admin/
+ajax/
+applicant/
+config/
+cron/
+includes/
+public/
+sql/
+uploads/
+```
+
+Existing relevant admin pages: `admin/stalls.php` (creates/edits/assigns/releases stalls), `admin/tent-simulation.php` (compares tent layouts, pricing, revenue, profit).
+
+Existing relevant DB tables (already in `sql/database.sql`): `stalls`, `tent_capacity_rules`, `tent_arrangement_rules`, `venue_layout_zones`, `stall_pricing_rules`.
+
+Existing hard business rules that must keep being enforced:
+
+- 50-seater tent (single canopy): min 1 stall, recommended average 4, **absolute max 5**.
+- 100-seater tent (double canopy): min 1 stall, recommended average 8, **absolute max 10**.
+- Supported arrangements per tent type already exist in `tent_arrangement_rules` (exclusive/large/standard/small etc.) — the designer must read from this table, not hardcode arrangement counts.
+- Venue layout is U-shaped: stage at top-center of the U, entrance on one side, exit on the other, visitors cross the stage frontage.
+- A reference layout already exists as a static image (attached separately) showing numbered tents (1–15, with one Beer tent), a Stage, Registration Desk (RD), Waste Collection Point (WCP), and two Mobile Toilets (MT-M, MT-F) arranged in a U shape. Use this as the default seed layout, not as a hardcoded constraint — the admin must be able to move, resize, add, and delete every element.
+
+## What to build
+
+A new admin module: **Venue Layout Designer**, at `admin/layout-designer.php`, that lets an admin visually design and edit the physical pitch layout via drag-and-drop, and have that layout drive real stall/tent allocation — not just be a picture.
+
+### Core features
+
+1. **Canvas / stage area**
+   - An HTML5 `<canvas>` or absolutely-positioned SVG/DIV surface (pick whichever is simpler to make draggable/resizable in vanilla JS) representing the pitch, with a fixed coordinate grid, snap-to-grid toggle, and zoom in/out.
+   - Load the existing U-shape as a background reference guide (non-blocking, toggleable) drawn from `venue_layout_zones`.
+
+2. **Element palette** (sidebar), draggable onto the canvas:
+   - Tent (50-seater single canopy)
+   - Tent (100-seater double canopy)
+   - Stage
+   - Registration Desk
+   - Waste Collection Point
+   - Mobile Toilet (Male)
+   - Mobile Toilet (Female)
+   - Walkway / path marker
+   - Generic custom label element (free text box, for anything not covered)
+
+3. **Per-element behavior once placed**
+   - Drag to reposition, resize (tents only — resize should be constrained to preset footprints matching 50-seater vs 100-seater, not arbitrary), rotate in 90° steps, delete, duplicate.
+   - Click to open a properties panel:
+     - For tent elements: tent type (50/100), tent group code (e.g. `TENT-A`), number of stalls in this tent (dropdown populated from `tent_arrangement_rules` for that tent type — e.g. 1/2/4/5 for 50-seater, 1/2/4/6/8/10 for 100-seater), category (student / SME / corporate / sponsor / food & beverage), U-layout zone.
+     - Client-side AND server-side validation: never allow a stall count above the absolute max for that tent type. Reject on save with a clear message if violated.
+     - For non-tent elements: label text only.
+   - Live on-canvas label showing tent group code + stall count once set.
+
+4. **Save / load**
+   - "Save Layout" persists the full canvas state (every element's type, x, y, width, height, rotation, and metadata) via AJAX to a new endpoint, e.g. `ajax/layout-save.php`.
+   - Layouts are versioned by name (so an admin can keep "Option 1" and "Option 2" from the tent simulation as separate saved layouts and switch the active one).
+   - "Load Layout" pulls a saved layout back via `ajax/layout-load.php` and re-renders it.
+   - One layout is flagged "active" — this is the one shown to applicants/used for real allocation.
+
+5. **Integration with existing stall allocation**
+   - When a tent element is saved with a tent group code, stall count, and tent type, the module must create/update matching rows in `stalls` and `tent_capacity_rules` so that `admin/stalls.php` and `admin/tent-simulation.php` see the same data — this is the main point of the module, not a cosmetic layout tool.
+   - If an admin deletes a tent element that already has assigned/paid applicants in `stalls`, block the delete and show which stalls are attached; require releasing them first from `admin/stalls.php`.
+   - Provide a live running total on-screen: total tents, total stalls, stalls per category, matching the revenue projection style already used in `admin/tent-simulation.php`.
+
+6. **Export**
+   - "Export Layout as Image" (PNG) and "Export Stall List as CSV" (reuse the CSV export style from `admin/reports.php`).
+
+### Files to create/modify
+
+- `admin/layout-designer.php` — page shell, admin auth check, loads palette + canvas + properties panel, includes CSRF token.
+- `assets/js/layout-designer.js` — all drag/resize/rotate/select/save/load logic, vanilla JS, no dependencies.
+- `assets/css/layout-designer.css` — canvas, palette, properties panel styling, consistent with existing `assets/css/style.css` and `responsive.css` conventions (check them for existing color variables/spacing before writing new ones).
+- `ajax/layout-save.php` — validates CSRF, validates each tent element against `tent_arrangement_rules`, writes to a new `layout_elements` table plus syncs `stalls` / `tent_capacity_rules`, all in a DB transaction.
+- `ajax/layout-load.php` — returns JSON of a saved layout's elements.
+- `sql/migrations/add_layout_designer.sql` — new table(s), written so it's appendable to `sql/database.sql` without a hardcoded `CREATE DATABASE`/`USE` statement, matching the existing migration style. Needs at minimum:
+  - `venue_layouts` (id, name, is_active, created_by, created_at, updated_at)
+  - `layout_elements` (id, layout_id FK, element_type, tent_group_code nullable, tent_type nullable, stall_count nullable, category nullable, u_zone nullable, x, y, width, height, rotation, label, z_index)
+- Update `README.md`: add this module to Admin Portal section, Common URLs, Key Database Tables, and Folder Structure sections following the existing doc style/tone.
+
+### Non-functional requirements
+
+- Must degrade gracefully on a small laptop screen (this is used by student guild admins, not necessarily on large monitors) — provide horizontal scroll or zoom-to-fit rather than breaking layout.
+- No external JS libraries (no interact.js, no fabric.js) unless you flag the tradeoff to me first and I approve it — default assumption is hand-rolled vanilla drag/resize using pointer events, since the rest of the system deliberately avoids dependencies.
+- Follow existing security conventions exactly: CSRF on save/delete, admin-session check at top of every admin page and every ajax endpoint under admin scope, PDO prepared statements everywhere, no raw SQL string concatenation.
+- Keep everything inside a single feature branch of changes — don't touch unrelated modules (payments, messaging, applicant portal) at all.
+
+### Before writing code
+
+1. Read the actual current contents of `admin/stalls.php`, `admin/tent-simulation.php`, `sql/database.sql`, `assets/css/style.css`, and `includes/` helper functions in my repo, so field names, table names, and helper function signatures match exactly rather than being guessed.
+2. Show me the proposed `layout_elements` / `venue_layouts` schema and the properties-panel field list before writing the full JS drag logic, so I can confirm the tent metadata fields match what `admin/stalls.php` expects.
+3. Then implement in this order: SQL migration → save/load AJAX endpoints (server-side validation first) → canvas/palette rendering → drag/resize/rotate → properties panel → stalls/tent_capacity_rules sync → CSV/PNG export → README update.
+
+---
+
+
+use the screens in this folder to implement this module to production level

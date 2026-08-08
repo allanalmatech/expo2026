@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Freshers Expo 2026 - Admin Layout Designer</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Montserrat & Inter Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#dadada",
+                        "tertiary-container": "#989999",
+                        "tertiary": "#5d5f5f",
+                        "background": "#f9f9f9",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-error-container": "#93000a",
+                        "primary": "#a04100",
+                        "on-background": "#1a1c1c",
+                        "on-primary-fixed-variant": "#7a3000",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#ffb693",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#ffdbcc",
+                        "on-surface": "#1a1c1c",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#a04100",
+                        "secondary": "#5f5e5e",
+                        "outline": "#8e7164",
+                        "on-secondary-fixed-variant": "#474746",
+                        "surface-container": "#eeeeee",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-surface": "#2f3131",
+                        "surface-container-low": "#f3f3f3",
+                        "outline-variant": "#e2bfb0",
+                        "surface": "#f9f9f9",
+                        "primary-container": "#ff6b00",
+                        "secondary-fixed": "#e5e2e1",
+                        "on-secondary-container": "#636262",
+                        "inverse-on-surface": "#f1f1f1",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "on-primary-container": "#572000",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e8e8e8",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#351000",
+                        "inverse-primary": "#ffb693",
+                        "secondary-container": "#e2dfde",
+                        "on-tertiary-container": "#2f3132",
+                        "on-surface-variant": "#5a4136",
+                        "surface-bright": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "48px",
+                        "container-max": "1280px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "base": "8px",
+                        "xl": "80px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "button": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "button": ["16px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        
+        .canvas-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, #e2e2e2 1px, transparent 1px),
+                linear-gradient(to bottom, #e2e2e2 1px, transparent 1px);
+        }
+
+        .tent-box {
+            background-color: #ff6b00;
+            border: 2px solid #a04100;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: move;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .tent-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        .stage-box {
+            background-color: #3b82f6;
+            border: 2px solid #1d4ed8;
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .status-badge-active {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dadada;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<div class="flex h-screen overflow-hidden">
+<!-- SIDEBAR NAVIGATION (Admin SideNavBar) -->
+<aside class="hidden md:flex flex-col h-screen p-md space-y-base bg-surface-container-lowest dark:bg-surface-dim border-r border-outline-variant w-[280px] shrink-0 z-40">
+<div class="flex items-center space-x-3 mb-xl">
+<div class="w-10 h-10 bg-primary-container flex items-center justify-center rounded-lg shadow-md">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary leading-none">Management Portal</h1>
+<p class="text-secondary font-body-sm mt-1">Expo 2026 Admin</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 bg-primary-container text-on-primary-container font-bold rounded-lg px-4 py-3 translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">layers</span>
+<span class="font-body-md">Applications</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md">Payments</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-body-md">Messaging</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-body-md">Compliance</span>
+</a>
+</nav>
+<div class="border-t border-outline-variant pt-md space-y-2">
+<a class="flex items-center space-x-3 text-secondary hover:bg-surface-container-high rounded-lg px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+<a class="flex items-center space-x-3 text-error hover:bg-error-container/20 rounded-lg px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- MAIN WORKSPACE -->
+<main class="flex-1 flex flex-col min-w-0 bg-background overflow-hidden relative">
+<!-- TOP BAR (Dashboard Context) -->
+<header class="h-20 bg-surface-container-lowest border-b border-outline-variant px-gutter flex items-center justify-between shrink-0 z-30">
+<div class="flex items-center space-x-4">
+<h2 class="font-headline-md text-headline-md text-on-background">Venue Layout Designer</h2>
+<div class="flex items-center space-x-2 bg-surface-container rounded-full px-3 py-1 ml-4 border border-outline-variant">
+<span class="w-2 h-2 rounded-full bg-green-600 animate-pulse"></span>
+<span class="text-label-md font-label-md uppercase tracking-wider text-on-secondary-container">Live Edit</span>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="flex items-center bg-surface-container-low border border-outline-variant rounded-lg p-1">
+<button class="px-4 py-1.5 rounded-md text-body-sm font-button bg-surface-container-lowest shadow-sm border border-outline-variant text-on-background">Layout V1.2</button>
+<button class="px-4 py-1.5 rounded-md text-body-sm font-button text-secondary hover:text-primary transition-colors">History</button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center space-x-2">
+<span class="font-label-md text-label-md text-secondary">ACTIVE</span>
+<button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none bg-primary-container" role="switch">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200"></span>
+</button>
+</div>
+<button class="bg-primary hover:bg-on-primary-fixed-variant text-white px-6 py-2.5 rounded-lg font-button shadow-lg shadow-primary/20 transition-all flex items-center space-x-2 scale-100 active:scale-95">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">save</span>
+<span>Save Layout</span>
+</button>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden">
+<!-- TOOL PALETTE (Left Sidebar) -->
+<aside class="w-64 bg-surface-container-lowest border-r border-outline-variant flex flex-col shrink-0 custom-scrollbar overflow-y-auto">
+<div class="p-md">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-md">Element Palette</h3>
+<div class="space-y-4">
+<!-- Drag items -->
+<div class="p-4 bg-surface-container hover:border-primary-container border-2 border-transparent rounded-xl cursor-grab active:cursor-grabbing transition-all group">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">ent</span>
+<span class="text-xs bg-primary-container/10 text-primary px-2 py-0.5 rounded-full font-bold">New</span>
+</div>
+<p class="font-button text-button text-on-surface">50-Seater Tent</p>
+<p class="text-xs text-secondary mt-1">10m x 10m unit</p>
+</div>
+<div class="p-4 bg-surface-container hover:border-primary-container border-2 border-transparent rounded-xl cursor-grab active:cursor-grabbing transition-all group">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">home</span>
+</div>
+<p class="font-button text-button text-on-surface">100-Seater Tent</p>
+<p class="text-xs text-secondary mt-1">20m x 10m unit</p>
+</div>
+<div class="p-4 bg-surface-container hover:border-primary-container border-2 border-transparent rounded-xl cursor-grab active:cursor-grabbing transition-all group">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">theater_comedy</span>
+</div>
+<p class="font-button text-button text-on-surface">Main Stage</p>
+<p class="text-xs text-secondary mt-1">Heavy structural</p>
+</div>
+<div class="p-4 bg-surface-container hover:border-primary-container border-2 border-transparent rounded-xl cursor-grab active:cursor-grabbing transition-all group">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">how_to_reg</span>
+</div>
+<p class="font-button text-button text-on-surface">Registration Desk</p>
+</div>
+<div class="p-4 bg-surface-container hover:border-primary-container border-2 border-transparent rounded-xl cursor-grab active:cursor-grabbing transition-all group">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">delete</span>
+</div>
+<p class="font-button text-button text-on-surface">Waste Point</p>
+</div>
+<div class="p-4 bg-surface-container hover:border-primary-container border-2 border-transparent rounded-xl cursor-grab active:cursor-grabbing transition-all group">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary">wc</span>
+</div>
+<p class="font-button text-button text-on-surface">Mobile Toilets</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- CANVAS (Main Design Area) -->
+<section class="flex-1 relative bg-surface-container-low overflow-auto p-xl custom-scrollbar">
+<!-- Zoom Controls -->
+<div class="fixed bottom-gutter left-[304px] z-20 flex flex-col space-y-2">
+<button class="w-10 h-10 bg-white shadow-lg border border-outline-variant rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="w-10 h-10 bg-white shadow-lg border border-outline-variant rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<button class="w-10 h-10 bg-white shadow-lg border border-outline-variant rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">center_focus_strong</span>
+</button>
+</div>
+<!-- Canvas -->
+<div class="mx-auto w-[1200px] h-[1600px] bg-white canvas-grid border border-outline-variant shadow-2xl relative p-md overflow-hidden" id="design-canvas">
+<!-- Reference Image Overlay for prompt context (not displayed, used for coordinate inspiration) -->
+<!-- U-Shaped Arrangement of Tents -->
+<!-- Row Top -->
+<div class="tent-box absolute left-[280px] top-[100px] w-[180px] h-[120px]">1</div>
+<div class="tent-box absolute left-[80px] top-[100px] w-[180px] h-[120px]">2</div>
+<!-- Left Column -->
+<div class="tent-box absolute left-[40px] top-[240px] w-[120px] h-[180px]">12</div>
+<div class="tent-box absolute left-[40px] top-[440px] w-[120px] h-[180px]">13</div>
+<div class="tent-box absolute left-[40px] top-[640px] w-[120px] h-[180px]">14</div>
+<div class="tent-box absolute left-[40px] top-[840px] w-[120px] h-[180px] ring-4 ring-primary-container ring-offset-4">
+<span class="text-center">15<br/><i class="text-xs font-normal">Beer</i></span>
+</div>
+<!-- Inner Grid -->
+<div class="tent-box absolute left-[300px] top-[400px] w-[110px] h-[110px]">6</div>
+<div class="tent-box absolute left-[180px] top-[400px] w-[110px] h-[110px]">9</div>
+<div class="tent-box absolute left-[300px] top-[530px] w-[110px] h-[110px]">7</div>
+<div class="tent-box absolute left-[180px] top-[530px] w-[110px] h-[110px]">10</div>
+<div class="tent-box absolute left-[300px] top-[660px] w-[110px] h-[110px]">8</div>
+<div class="tent-box absolute left-[180px] top-[660px] w-[110px] h-[110px]">11</div>
+<!-- Bottom Row -->
+<div class="tent-box absolute left-[550px] top-[920px] w-[180px] h-[110px]">3</div>
+<div class="tent-box absolute left-[360px] top-[920px] w-[180px] h-[110px]">4</div>
+<div class="tent-box absolute left-[170px] top-[920px] w-[180px] h-[110px]">5</div>
+<!-- Components -->
+<div class="stage-box absolute right-[100px] top-[420px] w-[220px] h-[400px]">STAGE</div>
+<div class="tent-box absolute right-[110px] top-[260px] w-[100px] h-[110px]">RD</div>
+<div class="tent-box absolute left-[40px] top-[1100px] w-[100px] h-[100px]">WCP</div>
+<div class="tent-box absolute left-[40px] top-[1380px] w-[100px] h-[110px]">MT (M)</div>
+<div class="tent-box absolute left-[160px] top-[1380px] w-[100px] h-[110px]">MT (F)</div>
+<!-- Directional Indicators -->
+<div class="absolute left-[80px] top-[1280px] flex flex-col items-center">
+<span class="material-symbols-outlined text-blue-600 text-[48px]">arrow_downward</span>
+</div>
+<div class="absolute left-[200px] top-[1500px] flex flex-col items-center">
+<span class="material-symbols-outlined text-blue-600 text-[48px]">arrow_upward</span>
+</div>
+<div class="absolute right-[220px] top-[100px] flex items-center">
+<span class="material-symbols-outlined text-blue-600 text-[64px] rotate-45">arrow_downward</span>
+</div>
+</div>
+</section>
+<!-- PROPERTIES PANEL (Right Sidebar) -->
+<aside class="w-80 bg-surface-container-lowest border-l border-outline-variant flex flex-col shrink-0">
+<div class="p-md border-b border-outline-variant">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-headline-md text-headline-md text-on-background">Properties</h3>
+<button class="text-secondary hover:text-on-background transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex items-center p-3 bg-primary/5 rounded-xl border border-primary/20 mb-4">
+<span class="material-symbols-outlined text-primary mr-3">ent</span>
+<div>
+<p class="font-button text-button leading-none text-primary">Stall #15 (Beer Garden)</p>
+<p class="text-xs text-secondary mt-1">Selection ID: UNIT-T-15</p>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-md custom-scrollbar space-y-6">
+<!-- Dimensions -->
+<div>
+<label class="block text-label-md font-label-md text-secondary uppercase tracking-widest mb-3">Dimensions</label>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-xs text-secondary mb-1">Width (m)</p>
+<input class="w-full bg-surface-container border-outline-variant rounded-lg focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" type="number" value="10"/>
+</div>
+<div>
+<p class="text-xs text-secondary mb-1">Height (m)</p>
+<input class="w-full bg-surface-container border-outline-variant rounded-lg focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" type="number" value="15"/>
+</div>
+</div>
+</div>
+<!-- Positioning -->
+<div>
+<label class="block text-label-md font-label-md text-secondary uppercase tracking-widest mb-3">Position</label>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-xs text-secondary mb-1">X Coordinate</p>
+<input class="w-full bg-surface-container border-outline-variant rounded-lg focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" type="number" value="40"/>
+</div>
+<div>
+<p class="text-xs text-secondary mb-1">Y Coordinate</p>
+<input class="w-full bg-surface-container border-outline-variant rounded-lg focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" type="number" value="840"/>
+</div>
+</div>
+</div>
+<!-- Label -->
+<div>
+<label class="block text-label-md font-label-md text-secondary uppercase tracking-widest mb-3">Label Text</label>
+<input class="w-full bg-surface-container border-outline-variant rounded-lg focus:border-primary-container focus:ring-2 focus:ring-primary-container/20" type="text" value="15 Beer"/>
+</div>
+<!-- Color/Style -->
+<div>
+<label class="block text-label-md font-label-md text-secondary uppercase tracking-widest mb-3">Fill Style</label>
+<div class="flex space-x-3">
+<button class="w-8 h-8 rounded-full bg-primary ring-2 ring-offset-2 ring-primary"></button>
+<button class="w-8 h-8 rounded-full bg-blue-500"></button>
+<button class="w-8 h-8 rounded-full bg-green-500"></button>
+<button class="w-8 h-8 rounded-full bg-slate-800"></button>
+<button class="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">palette</span>
+</button>
+</div>
+</div>
+<!-- Status Options -->
+<div>
+<label class="block text-label-md font-label-md text-secondary uppercase tracking-widest mb-3">Assignment Status</label>
+<div class="space-y-2">
+<label class="flex items-center p-3 border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+<input checked="" class="text-primary focus:ring-primary h-4 w-4" name="status" type="radio"/>
+<span class="ml-3 text-body-sm font-medium">Allocated (Vendor #902)</span>
+</label>
+<label class="flex items-center p-3 border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+<input class="text-primary focus:ring-primary h-4 w-4" name="status" type="radio"/>
+<span class="ml-3 text-body-sm font-medium">Available for Booking</span>
+</label>
+<label class="flex items-center p-3 border border-outline-variant rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+<input class="text-primary focus:ring-primary h-4 w-4" name="status" type="radio"/>
+<span class="ml-3 text-body-sm font-medium">Reserved / Maintenance</span>
+</label>
+</div>
+</div>
+</div>
+<div class="p-md border-t border-outline-variant bg-surface-container-low">
+<button class="w-full py-3 bg-inverse-surface text-white rounded-lg font-button hover:bg-black transition-all flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+<span>Delete Element</span>
+</button>
+</div>
+</aside>
+</div>
+<!-- Footer (Simple Copyright) -->
+<footer class="bg-inverse-surface py-4 px-gutter flex justify-between items-center text-on-primary shrink-0 z-40">
+<span class="text-body-sm font-body-sm opacity-80">© 2026 Freshers Expo Committee. All Rights Reserved.</span>
+<div class="flex space-x-6 text-body-sm font-body-sm">
+<a class="hover:text-primary-container transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary-container transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary-container transition-colors" href="#">Support</a>
+</div>
+</footer>
+</main>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        // Simple drag-and-drop placeholder visual feedback
+        document.querySelectorAll('.tent-box').forEach(box => {
+            box.addEventListener('mousedown', function() {
+                this.style.zIndex = '1000';
+                this.style.cursor = 'grabbing';
+            });
+            
+            box.addEventListener('mouseup', function() {
+                this.style.zIndex = 'auto';
+                this.style.cursor = 'move';
+            });
+        });
+
+        // Toggle Switch Interaction
+        const toggleBtn = document.querySelector('[role="switch"]');
+        const toggleCircle = toggleBtn.querySelector('span');
+        let active = true;
+
+        toggleBtn.addEventListener('click', () => {
+            active = !active;
+            if (active) {
+                toggleBtn.classList.replace('bg-secondary', 'bg-primary-container');
+                toggleCircle.classList.replace('translate-x-0', 'translate-x-5');
+            } else {
+                toggleBtn.classList.replace('bg-primary-container', 'bg-secondary');
+                toggleCircle.classList.replace('translate-x-5', 'translate-x-0');
+            }
+        });
+    </script>
+</body></html>

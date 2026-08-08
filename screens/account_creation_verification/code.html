@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Portal Account | Freshers Expo 2026</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#e5e2e1",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#989999",
+                    "surface-container-highest": "#e2e2e2",
+                    "primary-container": "#ff6b00",
+                    "surface": "#f9f9f9",
+                    "surface-tint": "#a04100",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-container": "#636262",
+                    "on-primary-container": "#572000",
+                    "on-secondary-fixed": "#1c1b1b",
+                    "surface-dim": "#dadada",
+                    "background": "#f9f9f9",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#ffb693",
+                    "primary-fixed": "#ffdbcc",
+                    "surface-container": "#eeeeee",
+                    "surface-container-high": "#e8e8e8",
+                    "surface-variant": "#e2e2e2",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "tertiary": "#5d5f5f",
+                    "surface-container-low": "#f3f3f3",
+                    "on-tertiary-container": "#2f3132",
+                    "primary": "#a04100",
+                    "outline-variant": "#e2bfb0",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#5a4136",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#351000",
+                    "on-surface": "#1a1c1c",
+                    "tertiary-fixed": "#e2e2e2",
+                    "outline": "#8e7164",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#c8c6c5",
+                    "primary-fixed-dim": "#ffb693",
+                    "secondary-container": "#e2dfde",
+                    "on-secondary-fixed-variant": "#474746",
+                    "secondary": "#5f5e5e",
+                    "inverse-surface": "#2f3131",
+                    "surface-bright": "#f9f9f9",
+                    "on-primary-fixed-variant": "#7a3000",
+                    "inverse-on-surface": "#f1f1f1",
+                    "on-background": "#1a1c1c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "container-max": "1280px",
+                    "xs": "4px",
+                    "md": "24px",
+                    "xl": "80px",
+                    "sm": "12px",
+                    "lg": "48px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "button": ["Montserrat"],
+                    "display-lg": ["Montserrat"],
+                    "headline-md": ["Montserrat"],
+                    "headline-lg-mobile": ["Montserrat"],
+                    "headline-lg": ["Montserrat"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "button": ["16px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .form-card {
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .form-card:hover {
+            box-shadow: 0px 8px 30px rgba(0,0,0,0.1);
+        }
+        .input-focus:focus {
+            border-color: #ff6b00;
+            outline: none;
+            box-shadow: 0 0 0 1px #ff6b00;
+        }
+        .bg-mesh {
+            background-color: #f9f9f9;
+            background-image: radial-gradient(at 0% 0%, rgba(255,107,0,0.05) 0px, transparent 50%),
+                              radial-gradient(at 100% 100%, rgba(255,107,0,0.05) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar (Shell Rule: Always rendered unless explicitly suppressed) -->
+<header class="sticky top-0 w-full z-50 flex justify-between items-center px-gutter py-4 bg-inverse-surface dark:bg-inverse-surface shadow-md">
+<div class="flex items-center gap-base">
+<span class="font-headline-md text-headline-md font-bold text-on-primary dark:text-on-primary">Freshers Expo 2026</span>
+</div>
+<nav class="hidden md:flex gap-lg">
+<a class="text-on-primary font-medium hover:text-primary-container transition-colors duration-200 font-button text-button" href="#">Marketplace</a>
+<a class="text-on-primary font-medium hover:text-primary-container transition-colors duration-200 font-button text-button" href="#">Guidelines</a>
+<a class="text-on-primary font-medium hover:text-primary-container transition-colors duration-200 font-button text-button" href="#">Support</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="hidden md:block bg-primary-container text-on-primary-container px-4 py-2 font-button text-button rounded-lg font-bold scale-95 active:opacity-80 transition-transform">Create Portal Account</button>
+<button class="text-on-primary font-medium hover:text-primary-container transition-colors duration-200 font-button text-button">Login</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow bg-mesh flex items-center justify-center py-lg px-gutter relative overflow-hidden">
+<!-- Abstract Decoration -->
+<div class="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-primary opacity-[0.03] rounded-full blur-[100px]"></div>
+<div class="absolute bottom-[-10%] left-[-5%] w-[300px] h-[300px] bg-primary opacity-[0.03] rounded-full blur-[80px]"></div>
+<div class="w-full max-w-md relative z-10" id="registration-container">
+<!-- Form Card -->
+<div class="bg-surface-container-lowest form-card p-md md:p-lg rounded-xl border border-outline-variant">
+<div class="mb-md">
+<h1 class="font-headline-lg text-headline-lg text-on-background mb-xs">Create Portal Account</h1>
+<p class="font-body-md text-secondary">Connect your stall application to the Vendor Management Portal.</p>
+</div>
+<form class="space-y-md" id="portal-form">
+<!-- Email/Phone Field -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="contact">Email or Phone Number</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary">mail</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-surface-container-highest rounded-lg input-focus transition-all font-body-md text-on-background" id="contact" name="contact" placeholder="e.g. 0772 000000 or email@example.com" required="" type="text"/>
+</div>
+<p class="font-body-sm text-secondary-fixed-dim text-[12px] flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                            Uganda numbers are normalized to standard international format (+256).
+                        </p>
+</div>
+<!-- Password Field -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="password">Preferred Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary">lock</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-surface-container-highest rounded-lg input-focus transition-all font-body-md text-on-background" id="password" name="password" placeholder="Create a strong password" required="" type="password"/>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-primary-container text-on-primary-container py-3 rounded-lg font-button text-button font-bold flex items-center justify-center gap-base hover:shadow-lg transition-all active:scale-[0.98]" type="submit">
+                        Verify &amp; Create Account
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</form>
+<!-- Status Messages Container -->
+<div class="mt-md hidden" id="status-message">
+<!-- Error State (Default Placeholder) -->
+<div class="hidden flex items-start gap-sm p-4 bg-error-container border border-error text-on-error-container rounded-lg" id="error-box">
+<span class="material-symbols-outlined text-error">error</span>
+<p class="font-body-sm">No stall application found. Please ensure you have filled the Google Form or used the correct contact details.</p>
+</div>
+</div>
+<!-- Alternative Link -->
+<div class="mt-lg pt-md border-t border-outline-variant flex flex-col items-center gap-sm">
+<p class="font-body-sm text-secondary">Haven't applied for a stall yet?</p>
+<a class="text-primary font-bold font-button text-button hover:underline" href="#">Complete Stall Application Form</a>
+</div>
+</div>
+</div>
+<!-- Success Overlay (Hidden by Default) -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center px-gutter opacity-0 pointer-events-none transition-all duration-300" id="success-overlay">
+<div class="absolute inset-0 bg-inverse-surface/60 backdrop-blur-sm"></div>
+<div class="bg-surface-container-lowest rounded-xl p-lg max-w-sm w-full relative shadow-2xl text-center transform scale-95 transition-transform duration-300" id="success-modal">
+<div class="w-20 h-20 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center mx-auto mb-md shadow-lg">
+<span class="material-symbols-outlined text-[48px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-background mb-xs">Registration Successful!</h2>
+<p class="font-body-md text-secondary mb-lg">Your account has been verified and linked to your stall application. You can now manage your bazaar presence.</p>
+<button class="w-full bg-inverse-surface text-on-primary py-3 rounded-lg font-button text-button font-bold hover:bg-on-background transition-colors" onclick="window.location.reload()">
+                    Go to Dashboard
+                </button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-lg px-gutter flex flex-col md:flex-row justify-between items-center bg-inverse-surface dark:bg-inverse-surface">
+<div class="mb-md md:mb-0">
+<span class="font-headline-md text-headline-md text-on-primary font-bold">Expo 2026</span>
+</div>
+<div class="flex gap-md mb-md md:mb-0">
+<a class="text-on-secondary-fixed-variant font-body-sm text-body-sm hover:text-on-primary underline transition-all" href="#">Privacy Policy</a>
+<a class="text-on-secondary-fixed-variant font-body-sm text-body-sm hover:text-on-primary underline transition-all" href="#">Terms of Service</a>
+<a class="text-on-secondary-fixed-variant font-body-sm text-body-sm hover:text-on-primary underline transition-all" href="#">Contact Support</a>
+</div>
+<p class="text-on-secondary-fixed-variant font-body-sm text-body-sm">© 2026 Freshers Expo Committee. All Rights Reserved.</p>
+</footer>
+<script>
+        const form = document.getElementById('portal-form');
+        const statusContainer = document.getElementById('status-message');
+        const errorBox = document.getElementById('error-box');
+        const successOverlay = document.getElementById('success-overlay');
+        const successModal = document.getElementById('success-modal');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const contact = document.getElementById('contact').value;
+            
+            // Simulation Logic: 
+            // If contact includes "error", show error box. Otherwise show success.
+            const isError = contact.toLowerCase().includes('error');
+
+            // Visual feedback on button
+            const btn = e.target.querySelector('button');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Verifying...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+
+                if (isError) {
+                    statusContainer.classList.remove('hidden');
+                    errorBox.classList.remove('hidden');
+                } else {
+                    statusContainer.classList.add('hidden');
+                    errorBox.classList.add('hidden');
+                    
+                    // Show success overlay
+                    successOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                    successModal.classList.remove('scale-95');
+                    successModal.classList.add('scale-100');
+                }
+            }, 1500);
+        });
+
+        // Close overlay if background clicked
+        successOverlay.addEventListener('click', (e) => {
+            if (e.target === successOverlay) {
+                window.location.reload();
+            }
+        });
+    </script>
+</body></html>

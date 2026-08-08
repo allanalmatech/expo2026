@@ -1,0 +1,525 @@
+Here is a complete prompt you can give to **OpenCode**:
+
+You are a senior professional full-stack engineer. Design, build, and ship a complete responsive web portal for managing Freshers Expo 2026 / Bazaar stall applications at Mbarara University of Science and Technology.
+
+Build the system using only:
+
+* Core PHP
+* MySQL
+* JavaScript
+* AJAX
+* HTML
+* CSS
+
+Do not use Laravel, React, Vue, Angular, Bootstrap, Tailwind, or any heavy framework. The system should be lightweight, clean, secure, and easy to deploy on normal shared hosting/cPanel.
+
+Use a professional Mbarara University of Science and Technology inspired color theme. The main theme should feel institutional, official, clean, and modern, using MUST-style colors such as green, yellow/gold, white, and dark accents. Keep the interface youthful and event-friendly but still formal enough for a university-managed activity.
+
+The system must be highly responsive, especially on mobile phones. Many users will access it using smartphones, so mobile usability should be the priority. Menus must not be cluttered. Use a simple collapsible mobile menu, clean cards, clear buttons, readable text, and enough spacing. Avoid overcrowding dashboards with too many items at once.
+
+Project Name:
+Freshers Expo Stall Management Portal
+
+Main Purpose:
+The portal should help applicants who already filled a Google Form create portal accounts without registering again from scratch. The system should check whether the applicant exists in the Google Form response data using email or phone number. If found, it should allow them to set a password and automatically import their form response details into the portal.
+
+Important User Flow:
+
+1. Applicant first fills the Google Form.
+2. Google Form responses are available in a Google Sheet or imported CSV/MySQL table.
+3. Applicant opens the portal.
+4. Applicant clicks “Create Portal Account.”
+5. Applicant enters the same email address or phone number used in the form.
+6. Applicant enters preferred password and confirms password.
+7. System checks if the email or phone number exists in the imported form responses.
+8. Phone numbers should be normalized before matching.
+9. If the applicant is found, the system creates their account and imports their details.
+10. If the applicant is not found, show a friendly message telling them to first fill in the Google Form or use the same email/phone number used during registration.
+11. Applicant logs in and views their application status, payment status, messages, compliance document status, and assigned stall information.
+12. Admin logs in and manages applicants, payments, messages, statuses, stall allocations, and reports.
+
+Phone Number Matching Requirement:
+The system should treat different Uganda phone number formats as the same number. For example:
+
+0771234567
+771234567
++256771234567
+256771234567
+
+All should be normalized internally to:
+
+256771234567
+
+Create a reusable PHP function for phone normalization. The system should match applicants using email first and phone number second. Emails should be compared in lowercase and trimmed.
+
+Security Requirements:
+
+1. Use password_hash() and password_verify() for passwords.
+2. Use prepared statements with MySQLi or PDO to prevent SQL injection.
+3. Validate all form inputs.
+4. Escape output properly to prevent XSS.
+5. Use secure PHP sessions.
+6. Protect admin pages so only admins can access them.
+7. Protect user pages so only logged-in users can access them.
+8. Add CSRF protection for important forms such as login, account creation, status update, payment verification, messaging, and stall allocation.
+9. Do not expose database errors directly to users.
+10. Store uploaded files safely.
+11. Restrict uploads to PDF, JPG, JPEG, and PNG.
+12. Limit upload size.
+13. Rename uploaded files securely.
+14. Prevent direct execution of uploaded files.
+
+Database Requirements:
+Create a clean MySQL database structure with SQL file included.
+
+Tables needed:
+
+1. form_responses
+
+* id
+* submitted_at
+* full_name
+* email
+* phone
+* normalized_phone
+* student_status
+* institution
+* program
+* year_of_study
+* business_name
+* business_nature
+* business_description
+* applicant_type
+* stall_type
+* number_of_stalls
+* electricity_needed
+* equipment_needed
+* table_chair_request
+* branding_space_needed
+* preferred_payment_method
+* proof_of_payment_url
+* rules_agreement
+* raw_data_json
+* created_at
+* updated_at
+
+2. users
+
+* id
+* form_response_id
+* full_name
+* email
+* phone
+* normalized_phone
+* password_hash
+* role
+* is_verified
+* account_status
+* created_at
+* updated_at
+
+Roles should include:
+
+* applicant
+* admin
+
+3. applications
+
+* id
+* user_id
+* form_response_id
+* application_status
+* payment_status
+* compliance_status
+* assigned_stall_number
+* assigned_stall_location
+* admin_notes
+* created_at
+* updated_at
+
+Application statuses:
+
+* Pending Review
+* Needs Correction
+* Approved
+* Rejected
+
+Payment statuses:
+
+* Not Paid
+* Pending Verification
+* Payment Received
+* Payment Rejected
+
+Compliance statuses:
+
+* Not Signed
+* Signed
+* Pending Review
+
+4. payment_uploads
+
+* id
+* user_id
+* application_id
+* file_path
+* original_filename
+* file_type
+* file_size
+* verification_status
+* uploaded_at
+* verified_by
+* verified_at
+* admin_comment
+
+5. messages
+
+* id
+* sender_id
+* receiver_id
+* title
+* body
+* message_type
+* is_read
+* created_at
+
+Message types:
+
+* direct
+* announcement
+
+6. announcement_recipients
+
+* id
+* announcement_id
+* user_id
+* is_read
+* read_at
+
+7. stalls
+
+* id
+* stall_number
+* stall_location
+* stall_type
+* is_allocated
+* allocated_to_user_id
+* created_at
+* updated_at
+
+8. compliance_documents
+
+* id
+* user_id
+* application_id
+* document_status
+* signed_at
+* file_path
+* created_at
+* updated_at
+
+Core Pages:
+Public:
+
+1. index.php
+
+* Landing page explaining the portal
+* Button to “Create Portal Account”
+* Button to “Login”
+* Button linking to Google Form
+
+2. create-account.php
+
+* User enters email or phone number
+* User enters password and confirm password
+* System checks imported form responses
+* If found, create account and application record
+* If not found, show clear message
+
+3. login.php
+
+* Login using email or phone number and password
+
+4. logout.php
+
+Applicant Portal:
+
+1. applicant/dashboard.php
+
+* Summary cards:
+
+  * Application Status
+  * Payment Status
+  * Compliance Status
+  * Assigned Stall
+* Show latest message/announcement
+* Show quick action buttons
+
+2. applicant/profile.php
+
+* View imported application details from form response
+
+3. applicant/payment.php
+
+* View existing proof of payment if imported from Google Form
+* Allow user to upload or replace proof of payment
+* Show payment verification status
+
+4. applicant/messages.php
+
+* View direct messages and announcements from admin
+* Mark messages as read
+
+5. applicant/compliance.php
+
+* View event rules
+* View compliance requirement
+* Mark willingness to sign or upload signed document if needed
+
+6. applicant/stall.php
+
+* Show assigned stall number and location once approved
+
+Admin Portal:
+
+1. admin/dashboard.php
+
+* Summary cards:
+
+  * Total Applicants
+  * Student Applicants
+  * Non-Student Applicants
+  * Pending Review
+  * Approved
+  * Rejected
+  * Paid
+  * Pending Payment Verification
+  * Stalls Allocated
+  * Available Stalls
+
+2. admin/applications.php
+
+* Table of all applicants
+* Search by name, phone, email, business name
+* Filters:
+
+  * Student / Non-student
+  * Business nature
+  * Application status
+  * Payment status
+  * Compliance status
+  * Stall type
+  * Electricity needed
+* Table should be mobile responsive and not cluttered
+
+3. admin/application-view.php
+
+* View full applicant profile
+* View business details
+* View payment proof
+* Update application status
+* Update payment status
+* Add admin notes
+* Assign stall number/location
+* Update compliance status
+
+4. admin/payments.php
+
+* View all payment uploads
+* Verify or reject payment proof
+* Add admin comment
+
+5. admin/messages.php
+
+* Send direct message to an applicant
+* Send bulk announcement to all applicants
+* Send announcement to selected groups such as approved applicants, unpaid applicants, students, non-students, food vendors, or pending applicants
+
+6. admin/stalls.php
+
+* Create stalls
+* Edit stalls
+* Assign stalls
+* View allocated and available stalls
+
+7. admin/reports.php
+
+* Export applicants to CSV
+* Export payment report to CSV
+* Export approved stall list to CSV
+
+8. admin/settings.php
+
+* Set Google Form link
+* Set event name
+* Set event dates
+* Set contact phone/email
+* Set stall rules text
+
+Google Form / Sheet Integration:
+For the first version, allow admin to import Google Form responses using CSV upload exported from Google Sheets.
+
+Create:
+admin/import-responses.php
+
+This page should:
+
+1. Allow admin to upload a CSV file from Google Form responses.
+2. Map CSV columns to database fields.
+3. Import responses into form_responses table.
+4. Normalize phone numbers during import.
+5. Avoid duplicate records using email or normalized phone.
+6. Update existing response if the same email or phone already exists.
+7. Show import summary:
+
+   * Total rows processed
+   * New records added
+   * Existing records updated
+   * Skipped rows
+   * Errors
+
+Also structure the code so that direct Google Sheets API integration can be added later.
+
+UI/UX Requirements:
+
+1. Fully responsive design.
+2. Mobile-first layout.
+3. Clean dashboard cards.
+4. Collapsible sidebar or top menu on mobile.
+5. Desktop sidebar should be simple and not overloaded.
+6. Use icons only where helpful.
+7. Use badges for statuses.
+8. Use clear empty states.
+9. Use confirmation modals for important admin actions.
+10. Use AJAX for smooth actions where appropriate:
+
+* Status updates
+* Payment verification
+* Mark message as read
+* Search and filters
+* Stall assignment
+
+11. Use loading indicators for AJAX actions.
+12. Use success and error toast messages.
+13. Avoid too many animations.
+14. Keep pages fast and lightweight.
+
+Suggested Folder Structure:
+
+* /assets
+
+  * /css
+
+    * style.css
+    * responsive.css
+  * /js
+
+    * main.js
+    * ajax.js
+  * /images
+* /config
+
+  * database.php
+  * app.php
+* /includes
+
+  * header.php
+  * footer.php
+  * sidebar.php
+  * auth.php
+  * csrf.php
+  * functions.php
+* /public
+
+  * index.php
+  * login.php
+  * create-account.php
+  * logout.php
+* /applicant
+
+  * dashboard.php
+  * profile.php
+  * payment.php
+  * messages.php
+  * compliance.php
+  * stall.php
+* /admin
+
+  * dashboard.php
+  * applications.php
+  * application-view.php
+  * payments.php
+  * messages.php
+  * stalls.php
+  * reports.php
+  * settings.php
+  * import-responses.php
+* /ajax
+
+  * update-status.php
+  * verify-payment.php
+  * send-message.php
+  * mark-read.php
+  * assign-stall.php
+  * filter-applications.php
+* /uploads
+
+  * /payments
+  * /compliance
+* /sql
+
+  * database.sql
+* README.md
+
+Important Functional Requirements:
+
+1. When an applicant creates an account, automatically create a linked application record.
+2. Applicants should not be allowed to create more than one account for the same form response.
+3. Admin should be able to manually link or correct applicant records if needed.
+4. If an applicant tries to create an account with a phone number that matches multiple records, show a message asking them to contact the organizing committee.
+5. If an applicant has already created an account, redirect them to login.
+6. Applicant details imported from Google Form should be view-only by default, but admin can correct them.
+7. Payment proof uploaded in the portal should be visible to admin immediately.
+8. Admin communication should appear in the applicant dashboard.
+9. The system should be deployable by uploading files to cPanel and importing the SQL database.
+
+Content to Include:
+Landing Page Text:
+“Welcome to the Freshers Expo 2026 Stall Management Portal. This portal is for applicants who have already submitted the stall registration Google Form. Use it to create your portal account, track your application, upload proof of payment, receive official communication, and view your stall allocation.”
+
+Not Found Message:
+“We could not find your stall application. Please first fill in the stall registration Google Form or use the same email address or phone number you used during submission.”
+
+Account Already Exists Message:
+“An account already exists for this application. Please log in instead.”
+
+Rules Summary:
+“By participating in the event, all stall holders agree to operate only within their allocated space, keep their stall clean and safe, avoid selling illegal or unauthorized items, follow hygiene requirements where applicable, respect university property, follow security and electrical safety instructions, avoid excessive noise, and comply with all guidance from the organizing committee. Final stall allocation is subject to approval and signing of the compliance document.”
+
+Deliverables:
+
+1. Complete working PHP project.
+2. MySQL database.sql file.
+3. Clean responsive UI.
+4. Applicant portal.
+5. Admin portal.
+6. CSV import feature for Google Form responses.
+7. Secure login and account creation.
+8. AJAX-powered admin actions.
+9. Payment proof upload and verification.
+10. Messaging and announcements.
+11. Stall allocation.
+12. CSV export reports.
+13. README.md with installation steps for cPanel/shared hosting.
+
+README should explain:
+
+1. How to create the database.
+2. How to import database.sql.
+3. How to configure database credentials.
+4. How to create the first admin account.
+5. How to import Google Form responses CSV.
+6. How applicants create accounts after filling the Google Form.
+7. How to manage permissions for uploads folder.
+
+Build the project professionally and make sure the code is organized, commented where necessary, secure, and easy for another developer to maintain.

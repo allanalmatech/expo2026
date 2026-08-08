@@ -1,0 +1,35 @@
+-- Migration: Add Layout Designer Tables
+-- This migration adds the necessary tables to store venue layouts and their constituent elements.
+
+CREATE TABLE IF NOT EXISTS `venue_layouts` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(255) NOT NULL,
+  `is_active` TINYINT(1) DEFAULT 0,
+  `created_by` INT NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `layout_elements` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `layout_id` INT NOT NULL,
+  `element_type` ENUM('tent_50', 'tent_100', 'stage', 'reg_desk', 'waste_point', 'toilet_m', 'toilet_f', 'walkway', 'label') NOT NULL,
+  `tent_group_code` VARCHAR(50) DEFAULT NULL,
+  `tent_type` ENUM('50', '100') DEFAULT NULL,
+  `stall_count` INT DEFAULT NULL,
+  `category` ENUM('student', 'sme', 'corporate', 'sponsor', 'food_beverage') DEFAULT NULL,
+  `u_zone` VARCHAR(50) DEFAULT NULL,
+  `x` INT NOT NULL DEFAULT 0,
+  `y` INT NOT NULL DEFAULT 0,
+  `width` INT NOT NULL DEFAULT 100,
+  `height` INT NOT NULL DEFAULT 100,
+  `rotation` INT NOT NULL DEFAULT 0,
+  `label` VARCHAR(255) DEFAULT NULL,
+  `z_index` INT NOT NULL DEFAULT 1,
+  FOREIGN KEY (`layout_id`) REFERENCES `venue_layouts`(`id`) ON DELETE CASCADE,
+  INDEX (`layout_id`),
+  INDEX (`tent_group_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Note: Syncing with `stalls` and `tent_capacity_rules` will be handled via PHP logic in ajax/layout-save.php
