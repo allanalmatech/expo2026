@@ -180,6 +180,10 @@ CREATE TABLE IF NOT EXISTS payment_receipts (
     payment_method VARCHAR(120) NULL,
     transaction_id VARCHAR(120) NULL,
     payment_description VARCHAR(255) NULL,
+    proof_file_path VARCHAR(255) NULL,
+    proof_original_filename VARCHAR(255) NULL,
+    proof_file_type VARCHAR(20) NULL,
+    proof_file_size INT UNSIGNED NULL,
     received_by VARCHAR(120) NULL,
     paid_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -195,6 +199,30 @@ CREATE TABLE IF NOT EXISTS payment_receipts (
     CONSTRAINT fk_payment_receipt_upload FOREIGN KEY (payment_upload_id) REFERENCES payment_uploads(id) ON DELETE SET NULL,
     CONSTRAINT fk_payment_receipt_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'payment_receipts' AND COLUMN_NAME = 'proof_file_path');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE payment_receipts ADD COLUMN proof_file_path VARCHAR(255) NULL AFTER payment_description', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'payment_receipts' AND COLUMN_NAME = 'proof_original_filename');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE payment_receipts ADD COLUMN proof_original_filename VARCHAR(255) NULL AFTER proof_file_path', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'payment_receipts' AND COLUMN_NAME = 'proof_file_type');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE payment_receipts ADD COLUMN proof_file_type VARCHAR(20) NULL AFTER proof_original_filename', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'payment_receipts' AND COLUMN_NAME = 'proof_file_size');
+SET @sql = IF(@col_exists = 0, 'ALTER TABLE payment_receipts ADD COLUMN proof_file_size INT UNSIGNED NULL AFTER proof_file_type', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 CREATE TABLE IF NOT EXISTS attendant_tags (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

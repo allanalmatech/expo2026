@@ -1246,6 +1246,23 @@ tr:last-child td { border-bottom: 0; }
     background: var(--orange-soft);
 }
 
+.table-icon-button svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.table-icon-button.is-disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    color: var(--gray-600);
+}
+
+.table-icon-button.is-disabled:hover {
+    border-color: var(--border);
+    background: #fff;
+}
+
 .table-icon-button.danger {
     color: var(--red);
 }

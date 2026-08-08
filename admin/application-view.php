@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         try {
-            $receipt = create_manual_payment_receipt($pdo, $applicationId, $amount, $description, $method, $transactionId, $paidAt !== '' ? $paidAt : null, (int) $admin['id']);
+            $receipt = create_manual_payment_receipt($pdo, $applicationId, $amount, $description, $method, $transactionId, $paidAt !== '' ? $paidAt : null, (int) $admin['id'], $_FILES['payment_proof'] ?? null);
             set_flash('success', 'Payment recorded. Receipt ' . $receipt['receipt_reference'] . ' is ready to print.');
             redirect('receipt.php?ref=' . rawurlencode((string) $receipt['receipt_reference']));
         } catch (Throwable $exception) {
@@ -363,7 +363,7 @@ require_once __DIR__ . '/../includes/header.php';
             <section class="panel">
                 <h2>Record Balance Payment</h2>
                 <p class="help-text">Use this when a vendor pays by mobile money, bank, or cash outside the portal. A 57mm receipt with QR verification will be generated immediately.</p>
-                <form method="post" class="form-grid two" data-confirm="Record this vendor payment and generate a receipt?">
+                <form method="post" enctype="multipart/form-data" class="form-grid two" data-confirm="Record this vendor payment and generate a receipt?">
                     <?php echo csrf_field(); ?>
                     <input type="hidden" name="application_id" value="<?php echo (int) $applicationId; ?>">
                     <input type="hidden" name="action" value="record_payment">
@@ -372,6 +372,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="field"><label>Payment Method</label><input name="payment_method" placeholder="Mobile Money, Bank, Cash"></div>
                     <div class="field"><label>Transaction ID</label><input name="transaction_id" maxlength="120" placeholder="Reference number"></div>
                     <div class="field"><label>Payment Time</label><input name="paid_at" type="datetime-local" value="<?php echo h(date('Y-m-d\TH:i')); ?>"></div>
+                    <div class="field" style="grid-column: 1 / -1;"><label>Proof of Payment Photo</label><input name="payment_proof" type="file" accept=".pdf,.jpg,.jpeg,.png,image/*" capture="environment"><small>Use the camera to snap payment proof, or attach an existing file.</small></div>
                     <button class="button button-primary" type="submit">Record and Print Receipt</button>
                 </form>
             </section>

@@ -35,6 +35,12 @@ $qrUrl = receipt_qr_image_url($verifyUrl, 150);
 $vendorName = payment_receipt_identity($receipt);
 $phone = trim((string) ($receipt['user_phone'] ?? $receipt['sheet_phone'] ?? ''));
 $email = trim((string) ($receipt['user_email'] ?? $receipt['sheet_email'] ?? ''));
+$inquiryPhone = trim(setting('contact_phone', ''));
+$inquiryEmail = trim(setting('contact_email', ''));
+$method = trim((string) ($receipt['payment_method'] ?? ''));
+$transactionId = trim((string) ($receipt['transaction_id'] ?? ''));
+$receiptDescription = trim($method . ($method !== '' && $transactionId !== '' ? ' / ' : '') . ($transactionId !== '' ? 'Txn: ' . $transactionId : ''));
+$receiptDescription = $receiptDescription !== '' ? $receiptDescription : 'Payment';
 
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -58,9 +64,7 @@ require_once __DIR__ . '/includes/header.php';
         <div class="receipt-row"><span>Business</span><strong><?php echo h($receipt['business_name'] ?? 'Not provided'); ?></strong></div>
         <div class="receipt-row"><span>Nature</span><strong><?php echo h($receipt['business_nature'] ?? 'Not provided'); ?></strong></div>
         <div class="receipt-separator"></div>
-        <div class="receipt-row"><span>Description</span><strong><?php echo h($receipt['payment_description'] ?? 'Payment'); ?></strong></div>
-        <div class="receipt-row"><span>Method</span><strong><?php echo h($receipt['payment_method'] ?? 'Not recorded'); ?></strong></div>
-        <?php if (!empty($receipt['transaction_id'])): ?><div class="receipt-row"><span>Txn ID</span><strong><?php echo h($receipt['transaction_id']); ?></strong></div><?php endif; ?>
+        <div class="receipt-row"><span>Description</span><strong><?php echo h($receiptDescription); ?></strong></div>
         <div class="receipt-row total"><span>Paid</span><strong><?php echo h(ugx_money((float) $receipt['paid_amount'])); ?></strong></div>
         <div class="receipt-row"><span>Total Due</span><strong><?php echo h(ugx_money((float) $receipt['total_amount'])); ?></strong></div>
         <div class="receipt-row"><span>Balance</span><strong><?php echo h(ugx_money((float) $receipt['balance_amount'])); ?></strong></div>
@@ -72,6 +76,9 @@ require_once __DIR__ . '/includes/header.php';
             <strong>Scan to verify receipt</strong>
         </div>
         <p class="receipt-footer-text">This receipt is valid only when the QR verification profile matches the vendor details above.</p>
+        <?php if ($inquiryPhone !== '' || $inquiryEmail !== ''): ?>
+            <p class="receipt-footer-text">Inquiries: <?php echo h(trim($inquiryPhone . ($inquiryPhone !== '' && $inquiryEmail !== '' ? ' / ' : '') . $inquiryEmail)); ?></p>
+        <?php endif; ?>
     </article>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

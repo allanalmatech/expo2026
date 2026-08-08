@@ -299,6 +299,10 @@ function ensure_vendor_access_schema(?PDO $pdo = null): void
             payment_method VARCHAR(120) NULL,
             transaction_id VARCHAR(120) NULL,
             payment_description VARCHAR(255) NULL,
+            proof_file_path VARCHAR(255) NULL,
+            proof_original_filename VARCHAR(255) NULL,
+            proof_file_type VARCHAR(20) NULL,
+            proof_file_size INT UNSIGNED NULL,
             received_by VARCHAR(120) NULL,
             paid_at DATETIME NULL,
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -315,6 +319,18 @@ function ensure_vendor_access_schema(?PDO $pdo = null): void
             CONSTRAINT fk_payment_receipt_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
+
+    $receiptColumns = [
+        'proof_file_path' => 'ALTER TABLE payment_receipts ADD COLUMN proof_file_path VARCHAR(255) NULL AFTER payment_description',
+        'proof_original_filename' => 'ALTER TABLE payment_receipts ADD COLUMN proof_original_filename VARCHAR(255) NULL AFTER proof_file_path',
+        'proof_file_type' => 'ALTER TABLE payment_receipts ADD COLUMN proof_file_type VARCHAR(20) NULL AFTER proof_original_filename',
+        'proof_file_size' => 'ALTER TABLE payment_receipts ADD COLUMN proof_file_size INT UNSIGNED NULL AFTER proof_file_type',
+    ];
+    foreach ($receiptColumns as $column => $sql) {
+        if (!db_column_exists($pdo, 'payment_receipts', $column)) {
+            $pdo->exec($sql);
+        }
+    }
 
     $pdo->exec(
         'CREATE TABLE IF NOT EXISTS attendant_tags (
@@ -565,7 +581,33 @@ function sync_upload_payment_receipt(PDO $pdo, int $uploadId): ?array
     return fetch_payment_receipt($pdo, 'receipt_reference', $reference);
 }
 
-function create_manual_payment_receipt(PDO $pdo, int $applicationId, float $amount, string $description, string $method, string $transactionId, ?string $paidAt, int $adminId): array
+function save_admin_payment_proof_file(?array $file): array
+{
+    if (!$file || (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE)) {
+        return [null, null, null, null];
+    }
+
+    $error = '';
+    if (!validate_uploaded_file($file, allowed_upload_extensions(), $error)) {
+        throw new RuntimeException($error ?: 'Please upload a valid payment proof.');
+    }
+
+    $dir = ensure_upload_dir('payments');
+    $name = secure_upload_name((string) $file['name']);
+    $target = $dir . '/' . $name;
+    if (!move_uploaded_file((string) $file['tmp_name'], $target)) {
+        throw new RuntimeException('The payment proof could not be saved.');
+    }
+
+    return [
+        'uploads/payments/' . $name,
+        (string) $file['name'],
+        strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION)),
+        (int) ($file['size'] ?? 0),
+    ];
+}
+
+function create_manual_payment_receipt(PDO $pdo, int $applicationId, float $amount, string $description, string $method, string $transactionId, ?string $paidAt, int $adminId, ?array $proofFile = null): array
 {
     ensure_vendor_access_schema($pdo);
     $statement = $pdo->prepare(
@@ -585,10 +627,11 @@ function create_manual_payment_receipt(PDO $pdo, int $applicationId, float $amou
     $token = bin2hex(random_bytes(32));
     $paidAt = parse_sheet_datetime($paidAt) ?? date('Y-m-d H:i:s');
     $balanceAfter = max(0, (float) ($totalsBefore['balance'] ?? 0) - $amount);
+    [$proofPath, $proofOriginalName, $proofType, $proofSize] = save_admin_payment_proof_file($proofFile);
 
     $pdo->prepare(
-        'INSERT INTO payment_receipts (application_id, form_response_id, user_id, receipt_reference, receipt_token, source_type, paid_amount, balance_amount, total_amount, payment_method, transaction_id, payment_description, received_by, paid_at, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, "admin", ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+        'INSERT INTO payment_receipts (application_id, form_response_id, user_id, receipt_reference, receipt_token, source_type, paid_amount, balance_amount, total_amount, payment_method, transaction_id, payment_description, proof_file_path, proof_original_filename, proof_file_type, proof_file_size, received_by, paid_at, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, "admin", ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
     )->execute([
         $applicationId,
         (int) ($application['form_response_id'] ?? 0) ?: null,
@@ -601,6 +644,10 @@ function create_manual_payment_receipt(PDO $pdo, int $applicationId, float $amou
         trim($method) ?: null,
         trim($transactionId) ?: null,
         trim($description) ?: 'Admin recorded payment',
+        $proofPath,
+        $proofOriginalName,
+        $proofType,
+        $proofSize,
         trim((string) ($application['admin_name'] ?? 'Admin')) ?: 'Admin',
         $paidAt,
     ]);
