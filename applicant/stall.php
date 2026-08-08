@@ -129,7 +129,9 @@ if ($application) {
 $requestedStallCount = $application ? max(1, (int) ($application['number_of_stalls'] ?? 1)) : 0;
 $assignedCount = count($assignedStalls);
 $legacyAssignedNumbers = trim((string) ($application['assigned_stall_number'] ?? ''));
-$assignedNumbers = $assignedCount > 0 ? implode(', ', array_map(static fn (array $stall): string => (string) $stall['stall_number'], $assignedStalls)) : $legacyAssignedNumbers;
+$assignedNumbers = $assignedCount > 0 ? implode(', ', array_map(function (array $stall): string {
+    return (string) $stall['stall_number'];
+}, $assignedStalls)) : $legacyAssignedNumbers;
 $displayAssignedCount = $assignedCount > 0 ? $assignedCount : ($legacyAssignedNumbers !== '' ? max(1, count(array_filter(array_map('trim', explode(',', $legacyAssignedNumbers))))) : 0);
 $assignedZoneNames = [];
 foreach ($assignedStalls as $stall) {

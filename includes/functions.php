@@ -251,7 +251,9 @@ function default_vendor_payment_sheet_url(): string
 
 function ensure_vendor_access_schema(?PDO $pdo = null): void
 {
-    $pdo ??= db();
+    if ($pdo === null) {
+        $pdo = db();
+    }
 
     $formColumns = [
         'sheet_paid_amount' => 'ALTER TABLE form_responses ADD COLUMN sheet_paid_amount DECIMAL(12,2) NOT NULL DEFAULT 0 AFTER proof_of_payment_url',
@@ -497,11 +499,13 @@ function sync_sheet_payment_receipt(PDO $pdo, int $responseId): ?array
     ];
 
     if ($receipt) {
-        $pdo->prepare(
+        $update = $pdo->prepare(
             'UPDATE payment_receipts
              SET application_id = ?, form_response_id = ?, user_id = ?, paid_amount = ?, balance_amount = ?, total_amount = ?, payment_method = ?, transaction_id = ?, payment_description = ?, received_by = ?, paid_at = ?, updated_at = NOW()
              WHERE id = ?'
-        )->execute([...$values, (int) $receipt['id']]);
+        );
+        $values[] = (int) $receipt['id'];
+        $update->execute($values);
         return fetch_payment_receipt($pdo, 'receipt_reference', (string) $receipt['receipt_reference']);
     }
 
@@ -560,11 +564,13 @@ function sync_upload_payment_receipt(PDO $pdo, int $uploadId): ?array
     ];
 
     if ($receipt) {
-        $pdo->prepare(
+        $update = $pdo->prepare(
             'UPDATE payment_receipts
              SET application_id = ?, form_response_id = ?, payment_upload_id = ?, user_id = ?, paid_amount = ?, balance_amount = ?, total_amount = ?, payment_method = ?, transaction_id = ?, payment_description = ?, received_by = ?, paid_at = ?, updated_at = NOW()
              WHERE id = ?'
-        )->execute([...$values, (int) $receipt['id']]);
+        );
+        $values[] = (int) $receipt['id'];
+        $update->execute($values);
         return fetch_payment_receipt($pdo, 'receipt_reference', (string) $receipt['receipt_reference']);
     }
 
@@ -1532,7 +1538,9 @@ function import_form_responses_from_csv_path(PDO $pdo, string $path, array $mapp
         $headerAttempts = 0;
         while (!form_response_mapping_has_identity($mapping) && $headerAttempts < 5 && ($candidate = fgetcsv($handle)) !== false) {
             $headerAttempts++;
-            if (!array_filter($candidate, fn($value) => trim((string) $value) !== '')) {
+            if (!array_filter($candidate, function ($value): bool {
+                return trim((string) $value) !== '';
+            })) {
                 continue;
             }
             $candidateMapping = auto_form_response_mapping($candidate);
@@ -1557,7 +1565,9 @@ function import_form_responses_from_csv_path(PDO $pdo, string $path, array $mapp
 
     while (($row = fgetcsv($handle)) !== false) {
         $summary['processed']++;
-        if (!array_filter($row, fn($value) => trim((string) $value) !== '')) {
+        if (!array_filter($row, function ($value): bool {
+            return trim((string) $value) !== '';
+        })) {
             $summary['skipped']++;
             continue;
         }

@@ -364,7 +364,15 @@ require_once __DIR__ . '/../includes/header.php';
                                 </button>
                                 <small><?php echo h(format_date($payment['event_at'])); ?></small>
                             </td>
-                            <td data-label="Source"><?php echo badge(match ((string) $payment['source']) { 'upload' => 'Portal Upload', 'admin' => 'Admin Received', default => 'Google Sheet' }); ?><br><small><?php echo h($payment['payment_status']); ?></small></td>
+                            <?php
+                            $sourceLabel = 'Google Sheet';
+                            if ((string) $payment['source'] === 'upload') {
+                                $sourceLabel = 'Portal Upload';
+                            } elseif ((string) $payment['source'] === 'admin') {
+                                $sourceLabel = 'Admin Received';
+                            }
+                            ?>
+                            <td data-label="Source"><?php echo badge($sourceLabel); ?><br><small><?php echo h($payment['payment_status']); ?></small></td>
                             <td data-label="Status"><?php echo badge($statusLabel); ?></td>
                             <td data-label="Comment"><?php echo h($payment['admin_comment'] ?? ''); ?></td>
                             <td data-label="Action">

@@ -25,7 +25,9 @@ $messages = $direct->fetchAll();
 $announcements = $pdo->prepare('SELECT m.*, u.full_name AS sender_name, ar.is_read AS read_state FROM announcement_recipients ar INNER JOIN messages m ON m.id = ar.announcement_id LEFT JOIN users u ON u.id = m.sender_id WHERE ar.user_id = ? ORDER BY m.created_at DESC LIMIT 4');
 $announcements->execute([(int) $user['id']]);
 $messages = array_merge($messages, $announcements->fetchAll());
-usort($messages, fn($a, $b) => strcmp((string) $b['created_at'], (string) $a['created_at']));
+usort($messages, function ($a, $b) {
+    return strcmp((string) $b['created_at'], (string) $a['created_at']);
+});
 $messages = array_slice($messages, 0, 3);
 
 $status = $application['application_status'] ?? 'Pending Review';

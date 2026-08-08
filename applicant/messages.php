@@ -14,7 +14,9 @@ $messages = $direct->fetchAll();
 $announcements = $pdo->prepare('SELECT m.*, u.full_name AS sender_name, ar.is_read AS read_state FROM announcement_recipients ar INNER JOIN messages m ON m.id = ar.announcement_id LEFT JOIN users u ON u.id = m.sender_id WHERE ar.user_id = ?');
 $announcements->execute([(int) $user['id']]);
 $messages = array_merge($messages, $announcements->fetchAll());
-usort($messages, fn($a, $b) => strcmp((string) $b['created_at'], (string) $a['created_at']));
+usort($messages, function ($a, $b) {
+    return strcmp((string) $b['created_at'], (string) $a['created_at']);
+});
 
 require_once __DIR__ . '/../includes/header.php';
 ?>

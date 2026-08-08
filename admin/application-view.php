@@ -195,6 +195,12 @@ $paymentReceipts = $receiptsStatement->fetchAll();
 
 $paymentProofs = [];
 if (!empty($application['proof_of_payment_url'])) {
+    $sheetVerificationStatus = 'Pending';
+    if ((string) ($application['payment_status'] ?? '') === 'Payment Received') {
+        $sheetVerificationStatus = 'Verified';
+    } elseif ((string) ($application['payment_status'] ?? '') === 'Payment Rejected') {
+        $sheetVerificationStatus = 'Rejected';
+    }
     $paymentProofs[] = [
         'row_key' => 'sheet:' . (int) $applicationId,
         'source' => 'sheet',
@@ -205,11 +211,7 @@ if (!empty($application['proof_of_payment_url'])) {
         'payment_amount' => 0.0,
         'payment_description' => 'Imported payment proof',
         'event_at' => $application['updated_at'] ?? $application['created_at'] ?? null,
-        'verification_status' => match ((string) ($application['payment_status'] ?? '')) {
-            'Payment Received' => 'Verified',
-            'Payment Rejected' => 'Rejected',
-            default => 'Pending',
-        },
+        'verification_status' => $sheetVerificationStatus,
         'admin_comment' => ($application['payment_status'] ?? '') === 'Payment Rejected' ? payment_reupload_comment() : '',
         'can_verify' => 1,
     ];
