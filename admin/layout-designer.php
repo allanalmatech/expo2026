@@ -258,7 +258,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <form id="element-form" class="form-grid">
                     <div class="notice">Select an element to edit its properties.</div>
                     <input type="hidden" id="element-id">
-                    <div class="field"><label>Label Text</label><input id="prop-label" type="text"></div>
+                    <div class="field"><label>Label Text</label><input id="prop-label" type="text"><small>For tents, this is the visible number/name on the map.</small></div>
                     <div class="form-grid two">
                         <div class="field"><label>X</label><input id="prop-x" type="number" min="0"></div>
                         <div class="field"><label>Y</label><input id="prop-y" type="number" min="0"></div>
@@ -273,11 +273,12 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="tent-only">
                         <div class="field"><label>Tent Group Code</label><input id="prop-tent-group" type="text" placeholder="TENT-A"></div>
                         <div class="field"><label>Tent Type</label><select id="prop-tent-type"><option value="50">50-Seater</option><option value="100">100-Seater</option></select></div>
-                        <div class="field"><label>Number of Stalls</label><select id="prop-stall-count"></select></div>
+                        <div class="field"><label>Number of Stalls</label><input id="prop-stall-count" type="number" min="1" step="1"><small data-stall-count-help></small></div>
                         <div class="field"><label>Category</label><select id="prop-category"><option value="student">Student / Startup</option><option value="sme">SME / Retail</option><option value="ngo_government">NGO / Government</option><option value="corporate">Corporate</option><option value="sponsor">Sponsor</option><option value="food_beverage">Food & Beverage</option></select></div>
                         <div class="field"><label>U-Layout Zone</label><select id="prop-zone"></select></div>
                     </div>
 
+                    <button class="button button-primary" id="apply-element-properties" type="submit">Apply Changes</button>
                     <button class="button button-danger" id="delete-element" type="button" aria-label="Delete selected element" title="Delete selected element">&#128465;</button>
                 </form>
             </aside>

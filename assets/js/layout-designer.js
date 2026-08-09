@@ -33,6 +33,7 @@
         tentGroup: document.getElementById('prop-tent-group'),
         tentType: document.getElementById('prop-tent-type'),
         stallCount: document.getElementById('prop-stall-count'),
+        stallHelp: document.querySelector('[data-stall-count-help]'),
         category: document.getElementById('prop-category'),
         zone: document.getElementById('prop-zone')
     };
@@ -103,6 +104,10 @@
         return type === 'tent_50' || type === 'tent_100';
     }
 
+    function displayTentGroupCode(group) {
+        return String(group || '').replace(/^TENT-0?/i, '');
+    }
+
     function snapValue(value) {
         return snap ? Math.round(value / (cfg.defaultCanvas?.grid || 40)) * (cfg.defaultCanvas?.grid || 40) : Math.round(value);
     }
@@ -130,6 +135,18 @@
 
     function rulesForTent(tentType) {
         return (cfg.arrangementRules || []).filter((rule) => String(rule.tent_code) === String(tentType));
+    }
+
+    function stallCountBounds(tentType) {
+        const counts = rulesForTent(tentType).map((rule) => Number(rule.number_of_stalls)).filter((count) => Number.isFinite(count) && count > 0);
+        if (!counts.length) return { min: 1, max: tentType === '100' ? 10 : 5 };
+        return { min: Math.min(...counts), max: Math.max(...counts) };
+    }
+
+    function clampStallCount(value, tentType) {
+        const bounds = stallCountBounds(tentType);
+        const count = Number.isFinite(Number(value)) ? Math.round(Number(value)) : defaultStallCount(tentType);
+        return Math.max(bounds.min, Math.min(bounds.max, count));
     }
 
     function defaultStallCount(tentType) {
@@ -238,10 +255,12 @@
         if (isTent(element.element_type)) {
             const group = element.tent_group_code || element.label || 'Tent';
             const bookings = cfg.tentBookings?.[group] || {};
-            const total = Number(bookings.total || element.stall_count || 0);
+            const configuredTotal = Number(element.stall_count || 0);
+            const total = editMode ? configuredTotal : Number(bookings.total || configuredTotal || 0);
             const booked = Math.min(Number(bookings.booked || 0), total || Number(bookings.booked || 0));
             const count = total ? ' (' + booked + '/' + total + ')' : '';
-            return group.replace(/^TENT-0?/, '') + count;
+            const visibleLabel = String(element.label || '').trim() || displayTentGroupCode(group) || 'Tent';
+            return visibleLabel + count;
         }
         return element.label || labels[element.element_type] || 'Element';
     }
@@ -269,13 +288,13 @@
     }
 
     function populateStallOptions(tentType, selected) {
-        fields.stallCount.innerHTML = '';
-        for (const rule of rulesForTent(tentType)) {
-            const option = document.createElement('option');
-            option.value = String(rule.number_of_stalls);
-            option.textContent = rule.number_of_stalls + ' stalls - ' + rule.arrangement_name;
-            if (Number(rule.number_of_stalls) === Number(selected)) option.selected = true;
-            fields.stallCount.appendChild(option);
+        const bounds = stallCountBounds(tentType);
+        fields.stallCount.min = String(bounds.min);
+        fields.stallCount.max = String(bounds.max);
+        fields.stallCount.value = String(clampStallCount(selected, tentType));
+        if (fields.stallHelp) {
+            const presets = rulesForTent(tentType).map((rule) => rule.number_of_stalls + ' ' + rule.arrangement_name).join(', ');
+            fields.stallHelp.textContent = 'Allowed range: ' + bounds.min + '-' + bounds.max + '. Presets: ' + (presets || 'none') + '. Custom counts inside the range are allowed.';
         }
     }
 
@@ -295,7 +314,8 @@
         const element = selectedElement();
         if (!element) return;
 
-        element.label = fields.label.value.trim() || labels[element.element_type] || 'Element';
+        const previousTentLabel = isTent(element.element_type) ? displayTentGroupCode(element.tent_group_code) : '';
+        const enteredLabel = fields.label.value.trim();
         element.x = snapValue(Number(fields.x.value || 0));
         element.y = snapValue(Number(fields.y.value || 0));
         element.width = Math.max(20, Number(fields.width.value || element.width));
@@ -303,15 +323,16 @@
 
         if (isTent(element.element_type)) {
             const tentType = fields.tentType.value;
+            const nextTentGroup = fields.tentGroup.value.trim().toUpperCase();
             element.element_type = tentType === '100' ? 'tent_100' : 'tent_50';
             element.tent_type = tentType;
-            element.tent_group_code = fields.tentGroup.value.trim().toUpperCase();
-            element.stall_count = Number(fields.stallCount.value || defaultStallCount(tentType));
+            element.tent_group_code = nextTentGroup;
+            element.label = enteredLabel === '' || enteredLabel === previousTentLabel ? (displayTentGroupCode(nextTentGroup) || labels[element.element_type] || 'Tent') : enteredLabel;
+            element.stall_count = clampStallCount(fields.stallCount.value, tentType);
             element.category = fields.category.value;
             element.u_zone = fields.zone.value;
-            if (!rulesForTent(tentType).some((rule) => Number(rule.number_of_stalls) === Number(element.stall_count))) {
-                element.stall_count = defaultStallCount(tentType);
-            }
+        } else {
+            element.label = enteredLabel || labels[element.element_type] || 'Element';
         }
 
         render();
@@ -682,27 +703,21 @@
         dragState = null;
     });
 
-    ['input', 'change'].forEach((eventName) => {
-        form.addEventListener(eventName, (event) => {
-            if (!editMode) return;
-            if (event.target.matches('input, select')) applyProperties();
-        });
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        applyProperties();
+        window.showToast?.('Element changes applied. Save the layout to persist them.', 'success');
+    });
+
+    form.addEventListener('change', (event) => {
+        if (!editMode) return;
+        if (event.target.matches('input, select')) applyProperties();
     });
 
     fields.tentType.addEventListener('change', () => {
         if (!editMode) return;
-        const element = selectedElement();
-        if (!element) return;
         const tentType = fields.tentType.value;
-        populateStallOptions(tentType, defaultStallCount(tentType));
-        const nextType = tentType === '100' ? 'tent_100' : 'tent_50';
-        element.element_type = nextType;
-        element.tent_type = tentType;
-        element.stall_count = defaultStallCount(tentType);
-        const size = presetSize(element, false);
-        element.width = size.width;
-        element.height = size.height;
-        render();
+        populateStallOptions(tentType, fields.stallCount.value || defaultStallCount(tentType));
     });
 
     document.getElementById('rotate-element').addEventListener('click', () => {

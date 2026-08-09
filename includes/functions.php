@@ -2491,13 +2491,22 @@ function sync_layout_stalls(PDO $pdo, array $newTentGroups, array $rules): void
     foreach ($newTentGroups as $group => $metadata) {
         $tentType = (string) $metadata['tent_type'];
         $stallCount = (int) $metadata['stall_count'];
-        $rule = $rules[$tentType][$stallCount] ?? null;
-        if (!$rule) {
-            throw new RuntimeException('Invalid stall count for ' . $group . '.');
+        $tentRules = $rules[$tentType] ?? [];
+        $ruleCounts = array_keys($tentRules);
+        $minStalls = $ruleCounts ? min($ruleCounts) : 1;
+        $maxStalls = $ruleCounts ? max($ruleCounts) : ($tentType === '100' ? 10 : 5);
+        if ($stallCount < $minStalls || $stallCount > $maxStalls) {
+            throw new RuntimeException($group . ' must have between ' . $minStalls . ' and ' . $maxStalls . ' stalls.');
         }
 
-        $arrangementKey = (string) $rule['arrangement_key'];
-        $stallType = (string) $rule['arrangement_name'];
+        $rule = $tentRules[$stallCount] ?? null;
+        if ($rule) {
+            $arrangementKey = (string) $rule['arrangement_key'];
+            $stallType = (string) $rule['arrangement_name'];
+        } else {
+            $arrangementKey = 'custom_' . $tentType . '_' . $stallCount;
+            $stallType = 'Custom ' . $stallCount . ' stall' . ($stallCount === 1 ? '' : 's');
+        }
         $uZone = $metadata['u_zone'] ?: null;
 
         $existingStatement->execute([$group]);

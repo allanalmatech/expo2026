@@ -36,6 +36,14 @@ $allowedCategories = ['student', 'sme', 'ngo_government', 'corporate', 'sponsor'
 $validZones = array_column($pdo->query('SELECT zone_key FROM venue_layout_zones')->fetchAll(), 'zone_key');
 
 $rules = layout_arrangement_rules_by_tent($pdo);
+$capacityRows = $pdo->query('SELECT tent_code, min_stalls, max_stalls FROM tent_capacity_rules')->fetchAll();
+$capacities = [];
+foreach ($capacityRows as $capacityRow) {
+    $capacities[(string) $capacityRow['tent_code']] = [
+        'min' => (int) $capacityRow['min_stalls'],
+        'max' => (int) $capacityRow['max_stalls'],
+    ];
+}
 
 $validated = [];
 $newTentGroups = [];
@@ -66,8 +74,11 @@ foreach ($elements as $index => $element) {
         $stallCount = (int) ($element['stall_count'] ?? 0);
         $category = (string) ($element['category'] ?? 'sme');
 
-        if (!isset($rules[$tentType][$stallCount])) {
-            json_response(['ok' => false, 'message' => 'Tent ' . ($tentGroup ?: '#' . ($index + 1)) . ' has an invalid stall count for a ' . $tentType . '-seater tent.'], 422);
+        $ruleCounts = array_keys($rules[$tentType] ?? []);
+        $minStalls = (int) ($capacities[$tentType]['min'] ?? ($ruleCounts ? min($ruleCounts) : 1));
+        $maxStalls = (int) ($capacities[$tentType]['max'] ?? ($ruleCounts ? max($ruleCounts) : ($tentType === '100' ? 10 : 5)));
+        if ($stallCount < $minStalls || $stallCount > $maxStalls) {
+            json_response(['ok' => false, 'message' => 'Tent ' . ($tentGroup ?: '#' . ($index + 1)) . ' must have between ' . $minStalls . ' and ' . $maxStalls . ' stalls.'], 422);
         }
         if (!in_array($category, $allowedCategories, true)) {
             json_response(['ok' => false, 'message' => 'Tent ' . ($tentGroup ?: '#' . ($index + 1)) . ' has an invalid category.'], 422);

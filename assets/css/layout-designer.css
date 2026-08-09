@@ -378,6 +378,7 @@
 #element-form.is-empty .field,
 #element-form.is-empty .header-actions,
 #element-form.is-empty .tent-only,
+#element-form.is-empty #apply-element-properties,
 #element-form.is-empty #delete-element {
     display: none;
 }
