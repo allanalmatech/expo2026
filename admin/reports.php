@@ -97,8 +97,10 @@ if (isset($_GET['export'])) {
 
             $receiptRefs->execute([$applicationId, $applicationId, $responseId, $responseId]);
             $references = (string) ($receiptRefs->fetchColumn() ?: '');
+            $receiptRefs->closeCursor();
             $latestReceipt->execute([$applicationId, $applicationId, $responseId, $responseId]);
             $receipt = $latestReceipt->fetch() ?: [];
+            $latestReceipt->closeCursor();
 
             $paymentStatus = (string) ($row['payment_status'] ?? '');
             if ($paymentStatus === '') {
