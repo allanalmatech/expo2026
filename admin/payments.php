@@ -318,7 +318,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <p>Review portal uploads and payment proof links imported from the Google Sheet.</p>
             </div>
             <div class="header-actions">
-                <a class="button button-secondary" href="<?php echo h(app_url('admin/reports.php?export=payments_xls')); ?>">Export Updated XLS</a>
+                <a class="button button-secondary" href="<?php echo h(app_url('admin/reports.php?export=payments_xls')); ?>">Export Paid Customers XLS</a>
                 <button class="button button-primary" type="button" data-proof-modal-open="receive-payment-modal">Receive Payment</button>
             </div>
         </div>

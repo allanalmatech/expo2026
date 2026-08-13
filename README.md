@@ -199,7 +199,7 @@ Admin pages are under `/admin/`.
 - `messages.php` sends direct messages and bulk announcements.
 - `stalls.php` creates, edits, assigns and releases stalls.
 - `layout-designer.php` visually edits the venue layout and syncs tent groups into stall records.
-- `reports.php` exports applicant, payment and stall CSV reports.
+- `reports.php` exports applicant, payment and stall CSV reports, plus an XLS of paid customers with generated receipts.
 - `settings.php` updates public portal settings.
 - `import-responses.php` imports Google Form CSV files manually.
 - `sync-google-sheet.php` connects and syncs a Google Sheet automatically.

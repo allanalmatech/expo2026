@@ -15,7 +15,31 @@ if (isset($_GET['export'])) {
 
     if ($type === 'payments_xls') {
         ensure_payment_upload_schema();
-        $filename = 'freshers-expo-updated-payments-' . date('Ymd-His') . '.xls';
+
+        // Ensure imported and verified payments have receipts before exporting.
+        $sheetReceipts = $pdo->query(
+            'SELECT fr.id
+             FROM form_responses fr
+             LEFT JOIN payment_receipts pr ON pr.source_type = "sheet" AND pr.form_response_id = fr.id
+             WHERE COALESCE(fr.sheet_paid_amount, 0) > 0 AND pr.id IS NULL
+             ORDER BY fr.id ASC'
+        )->fetchAll();
+        foreach ($sheetReceipts as $row) {
+            sync_sheet_payment_receipt($pdo, (int) $row['id']);
+        }
+
+        $uploadReceipts = $pdo->query(
+            'SELECT pu.id
+             FROM payment_uploads pu
+             LEFT JOIN payment_receipts pr ON pr.payment_upload_id = pu.id
+             WHERE pu.verification_status = "Verified" AND pu.payment_amount > 0 AND pr.id IS NULL
+             ORDER BY pu.id ASC'
+        )->fetchAll();
+        foreach ($uploadReceipts as $row) {
+            sync_upload_payment_receipt($pdo, (int) $row['id']);
+        }
+
+        $filename = 'freshers-expo-paid-customers-with-receipts-' . date('Ymd-His') . '.xls';
         header('Content-Type: application/vnd.ms-excel; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Pragma: no-cache');
@@ -27,27 +51,30 @@ if (isset($_GET['export'])) {
              FROM form_responses fr
              LEFT JOIN applications a ON a.form_response_id = fr.id
              LEFT JOIN users u ON u.id = a.user_id
-             WHERE COALESCE(fr.sheet_paid_amount, 0) > 0
-                OR EXISTS (SELECT 1 FROM payment_uploads pu WHERE pu.application_id = a.id AND pu.verification_status = "Verified" AND pu.payment_amount > 0)
-                OR EXISTS (SELECT 1 FROM payment_receipts prp WHERE (prp.application_id = a.id OR prp.form_response_id = fr.id) AND prp.paid_amount > 0)
+             WHERE EXISTS (
+                 SELECT 1
+                 FROM payment_receipts prp
+                 WHERE prp.paid_amount > 0
+                   AND (prp.application_id = a.id OR prp.form_response_id = fr.id)
+             )
              ORDER BY COALESCE(fr.payment_recorded_at, fr.submitted_at, fr.updated_at, fr.created_at) DESC, fr.id DESC'
         )->fetchAll();
         $receiptRefs = $pdo->prepare(
             'SELECT GROUP_CONCAT(receipt_reference ORDER BY COALESCE(paid_at, created_at) DESC SEPARATOR ", ")
              FROM payment_receipts
-             WHERE (? > 0 AND application_id = ?) OR (? > 0 AND form_response_id = ?)'
+             WHERE paid_amount > 0 AND ((? > 0 AND application_id = ?) OR (? > 0 AND form_response_id = ?))'
         );
         $latestReceipt = $pdo->prepare(
             'SELECT *
              FROM payment_receipts
-             WHERE (? > 0 AND application_id = ?) OR (? > 0 AND form_response_id = ?)
+             WHERE paid_amount > 0 AND ((? > 0 AND application_id = ?) OR (? > 0 AND form_response_id = ?))
              ORDER BY COALESCE(paid_at, created_at) DESC, id DESC
              LIMIT 1'
         );
 
         echo "<!doctype html><html><head><meta charset=\"utf-8\"><style>td{mso-number-format:'\\@';}</style></head><body><table border=\"1\">";
         echo '<thead><tr>';
-        foreach (['No.', 'Names', 'Phone number', 'Email', 'Business Name', 'Business Nature', 'Stall Number', 'Qty', 'Paid', 'Balance', 'Totals', 'Max Staff', 'Payment Method', 'Transaction ID', 'Handled By', 'Time Stamp', 'Payment Status', 'Account Status', 'Receipt Reference'] as $heading) {
+        foreach (['No.', 'Names', 'Phone number', 'Email', 'Business Name', 'Business Nature', 'Stall Number', 'Qty', 'Paid', 'Balance', 'Totals', 'Max Staff', 'Payment Method', 'Transaction ID', 'Handled By', 'Time Stamp', 'Payment Status', 'Account Status', 'Receipt Reference(s)'] as $heading) {
             echo '<th>' . h($heading) . '</th>';
         }
         echo '</tr></thead><tbody>';
@@ -142,7 +169,7 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
         <div class="card-grid">
             <section class="content-card"><h2>Applicants</h2><p>Full applicant list with application, payment, compliance, and stall status.</p><a class="button button-primary" href="<?php echo h(app_url('admin/reports.php?export=applicants')); ?>">Export Applicants CSV</a></section>
-            <section class="content-card"><h2>Payments</h2><p>Uploaded payment proofs, synced paid-register data, balances, receipts, and verification decisions.</p><a class="button button-primary" href="<?php echo h(app_url('admin/reports.php?export=payments_xls')); ?>">Export Updated XLS</a> <a class="button button-ghost" href="<?php echo h(app_url('admin/reports.php?export=payments')); ?>">Export Payments CSV</a></section>
+            <section class="content-card"><h2>Paid Customers with Receipts</h2><p>Export customers with confirmed payments and generated receipt references.</p><a class="button button-primary" href="<?php echo h(app_url('admin/reports.php?export=payments_xls')); ?>">Export Paid Customers XLS</a> <a class="button button-ghost" href="<?php echo h(app_url('admin/reports.php?export=payments')); ?>">Export Payments CSV</a></section>
             <section class="content-card"><h2>Approved Stall List</h2><p>Allocated and available stalls with tent groups, U-layout zones, and linked applicants.</p><a class="button button-primary" href="<?php echo h(app_url('admin/reports.php?export=stalls')); ?>">Export Stall CSV</a></section>
         </div>
     </main>
